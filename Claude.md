@@ -2,6 +2,8 @@
 
 Diese Web-App namens PulleyPal hilft Personen, die ihr Ringband beim Kletter-/ Bouldersport verletzt oder gerissen haben, bei der Genesung, durch Anwendung eines logischen Vorgangs je Verletzungsart.
 
+**Fachliche Grundlage:** [docs/behandlungsschema.md](docs/behandlungsschema.md). Vor jeder Arbeit an Abläufen, Zeiträumen oder Texten zur Behandlung lesen. Es gilt vor dem Code.
+
 # Über mich
 
 * Ich bin kein Entwickler. Erkläre alles in einfacher Sprache.
