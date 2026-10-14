@@ -14,6 +14,10 @@ Herkunft des Dokuments (Autor, Klinik, Datum, Nutzungsrecht): **noch offen**.
 
 - Die Person **wählt ihren Grad selbst**, so wie ihn Arzt oder Ärztin festgestellt hat. Die App stellt keine Diagnose.
 - Die App ersetzt keine ärztliche Behandlung. Bei Grad IV b (operativ) gibt sie nur Eckpunkte vor, keinen Wochenplan.
+- Die Zeit zählt ab dem **Tag der Verletzung** (Grad I bis IV a) bzw. ab dem **Tag der OP** (Grad IV b).
+- Die App gibt es auf Deutsch und Englisch. **Maßgeblich ist die deutsche Fassung**; die englischen Texte werden von Claude übersetzt und vom Projektinhaber geprüft.
+- Vor dem Erfassen der Verletzung bestätigt die Person einmalig, dass die App keine ärztliche Behandlung ersetzt.
+- Wo das Schema eine Spanne nennt (z. B. „6–8 Wochen“), gibt die Person die **ärztlich verordnete Dauer** an. Ohne Angabe gilt der **längere, vorsichtigere Wert**.
 
 ## 1. Einteilung nach Grad
 
@@ -65,8 +69,27 @@ Vollbelastung, Wettkampffähigkeit. Weiterhin Taping für mindestens ein Jahr, b
 ### Grad I
 
 - Volles Klettern nach **6 Wochen** (laut Tabelle). Die Angabe „Vollbelastung ab 4 Monaten“ aus Abschnitt 2 gilt **nicht** für Grad I.
-- Wochenplan: Es gelten die Phasen **„Woche 3–4“ und „Woche 5–6“**. Die Phase „Woche 1–2“ entfällt.
-  - **Offen:** Laufen diese beiden Phasen ab Verletzung in Woche 1–2 und 3–4 (passend zu 2–4 Wochen Schutz)? Oder gelten sie wörtlich in Woche 3–4 und 5–6?
+- Wochenplan: Es gelten die Inhalte der Phasen **„Woche 3–4“ und „Woche 5–6“**. Die Phase „Woche 1–2“ entfällt.
+  - Die Inhalte sind **vorgezogen**: Inhalt „Woche 3–4“ läuft in Woche 1–2 ab Verletzung, Inhalt „Woche 5–6“ in Woche 3–4.
+
+- Schutzart: Die Person gibt an, ob **H-Tape oder Ring** verordnet wurde (Standard: Ring), und die Dauer 2–4 Wochen (Standard: 4).
+- Bei nur 2 Wochen Schutz läuft der Inhalt „Woche 5–6“ (in Woche 3–4) **mit H-Tape** statt unter Ringbandschutz.
+
+### Ablauf nach der Ringzeit (Grad I bis IV a)
+
+Für alle konservativen Grade gilt dieselbe Abfolge:
+
+1. **Ring-Phasen** nach Wochenplan (Abschnitt 2 bzw. Grad I wie oben). Ihr Ende richtet sich nach der verordneten Ringdauer.
+2. **Aufbautraining**: vom Ende der Ringzeit bis zur vollen sportartspezifischen Aktivität (Inhalte: „Aufbautraining nach der Ruhigstellungsphase“ aus Abschnitt 2).
+3. **Schutzphase mit H-Tape**: von der vollen sportartspezifischen Aktivität bis zum Ende des H-Tape-Schutzes laut Tabelle.
+4. **Abgeschlossen.** Bei Grad IV a und IV b ab 12 Monaten mit dem Hinweis, beim Klettern dauerhaft zu tapen.
+
+- Die Meilensteine (leichte und volle sportartspezifische Aktivität, H-Tape-Ende) gelten **fest laut Tabelle**. Die verordnete Ringdauer verschiebt sie nicht.
+- **„Leichte sportartspezifische Aktivität“ bedeutet „vorsichtiges Klettern mit H-Tape“.** Liegt sie nach dem Ende der Ringzeit (z. B. Grad IV a: Ring bis Woche 8, Klettern ab Woche 11), sind im Aufbautraining bis dahin nur Hängeübungen, Elastikband-Entlastung und Klimmzüge mit H-Tape vorgesehen, **noch kein Klettern**.
+
+### Abschnitt „Ab 4 Monaten“
+
+- Für **Grad II und III gilt die Tabelle** (volle sportartspezifische Aktivität nach 8–10 Wochen bzw. nach 3 Monaten). Der Abschnitt „Ab 4 Monaten“ aus Abschnitt 2 betrifft unter den konservativen Graden nur **Grad IV a**.
 
 ### Grad II und III
 
@@ -104,4 +127,3 @@ Die App fordert die Person auf, ärztlich zu klären:
 ## 4. Noch offene Punkte
 
 - Herkunft und Nutzungsrecht des Dokuments (siehe oben).
-- Grad I: zeitliche Lage der Phasen (siehe Abschnitt 3).
