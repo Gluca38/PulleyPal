@@ -46,14 +46,14 @@ function isProtectionType(value: string): value is ProtectionType {
 // Spätester erlaubter Starttag. Das Formular schickt das heutige Datum des
 // Geräts mit, damit „nicht in der Zukunft“ in der Zeitzone der Person gilt.
 // Weicht es mehr als einen Tag vom Server ab, gilt das Serverdatum (UTC).
-function latestStartDate(deviceToday: string, serverToday: string) {
+export function latestStartDate(deviceToday: string, serverToday: string) {
   if (ISO_DATE.test(deviceToday) && Math.abs(daysBetween(serverToday, deviceToday)) <= 1) {
     return deviceToday;
   }
   return serverToday;
 }
 
-function isValidDate(value: string) {
+export function isValidDate(value: string) {
   // Abgleich hin und zurück erkennt Tage wie den 31. Februar
   return ISO_DATE.test(value) && addDays(value, 0) === value;
 }

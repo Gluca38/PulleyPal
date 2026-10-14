@@ -12,6 +12,9 @@ export type Injury = {
   protectionType: ProtectionType | null;
 };
 
+// Die gespeicherte Verletzung samt Kontraktur-Meldung (nur Grad IV a)
+export type SavedInjury = Injury & { contractureReported: boolean };
+
 // Schutzart im Code und in der Datenbank (Spalte protection_type)
 const PROTECTION_TYPE_IN_DB: Record<ProtectionType, string> = { ring: "ring", hTape: "h_tape" };
 
@@ -31,12 +34,12 @@ function injuryToRow(injury: Injury) {
 }
 
 // Liefert die Verletzung der eingeloggten Person oder null, wenn noch keine erfasst ist
-export async function getInjury(): Promise<Injury | null> {
+export async function getInjury(): Promise<SavedInjury | null> {
   const user = await getCurrentUser();
   const supabase = await createClient();
   const { data, error } = await supabase
     .from("injuries")
-    .select("grade, start_date, prescribed_duration_weeks, protection_type")
+    .select("grade, start_date, prescribed_duration_weeks, protection_type, contracture_reported_at")
     .eq("user_id", user.id)
     .maybeSingle();
 
@@ -52,6 +55,7 @@ export async function getInjury(): Promise<Injury | null> {
     startDate: data.start_date,
     prescribedDurationWeeks: data.prescribed_duration_weeks,
     protectionType: protectionTypeFromDb(data.protection_type),
+    contractureReported: data.contracture_reported_at !== null,
   };
 }
 
@@ -97,6 +101,25 @@ export async function updateInjury(injury: Injury): Promise<UpdateInjuryResult> 
 
   if (error) {
     console.error("Verletzung konnte nicht geändert werden:", error.message);
+    return "error";
+  }
+  return data.length > 0 ? "updated" : "notFound";
+}
+
+// Meldet eine Kontraktur oder nimmt die Meldung zurück. Nur bei Grad IV a;
+// bei einem anderen Grad (z. B. in einem anderen Tab geändert) passiert nichts.
+export async function setContractureReported(reported: boolean): Promise<UpdateInjuryResult> {
+  const user = await getCurrentUser();
+  const supabase = await createClient();
+  const { data, error } = await supabase
+    .from("injuries")
+    .update({ contracture_reported_at: reported ? new Date().toISOString() : null })
+    .eq("user_id", user.id)
+    .eq("grade", "IVa")
+    .select("user_id");
+
+  if (error) {
+    console.error("Kontraktur-Meldung konnte nicht gespeichert werden:", error.message);
     return "error";
   }
   return data.length > 0 ? "updated" : "notFound";

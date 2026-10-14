@@ -52,6 +52,8 @@ test("Neue Person erfasst Grad II und sieht die Heute-Karte", async ({ page }) =
   await expect(todayCard.getByText("Kein Klettern mit dem Ringbandschutzring")).toBeVisible();
   await expect(todayCard.getByText(/Leichte sportartspezifische Aktivität/)).toBeVisible();
   await expect(todayCard.getByText(/noch 22 Tage/)).toBeVisible();
+  // Eine Kontraktur lässt sich nur bei Grad IV a melden
+  await expect(page.getByText(/Kontraktur|nicht mehr ganz strecken/)).toHaveCount(0);
 
   // Die Verletzung ist erfasst, das Formular wird nicht mehr gebraucht
   await page.goto("/verletzung");
@@ -373,4 +375,81 @@ test("Ohne erfasste Verletzung führt Ändern zum Erfassen", async ({ page }) =>
   await login(page);
   await page.goto("/verletzung/aendern");
   await expect(page).toHaveURL("/verletzung");
+});
+
+async function recordGradeFourA(page: Page, startDate: string) {
+  await page.getByRole("radio", { name: /Grad IV a/ }).check();
+  await page.getByLabel("Tag der Verletzung").fill(startDate);
+  await page.getByLabel(/keine ärztliche Behandlung ersetzt/).check();
+  await page.getByRole("button", { name: "Behandlungsplan erstellen" }).click();
+  await expect(page).toHaveURL("/");
+}
+
+test("Grad IV a: Kontraktur melden, zurücknehmen, nach OP zu Grad IV b wechseln", async ({ page }) => {
+  await login(page);
+  // Vor 60 Tagen verletzt
+  await recordGradeFourA(page, daysAgo(60));
+
+  // Unaufdringlich: zugeklappt, kein Hinweis
+  const notice = page.getByRole("region", { name: /Kontraktur gemeldet/ });
+  await expect(notice).toHaveCount(0);
+  const reportButton = page.getByRole("button", { name: "Kontraktur melden" });
+  await expect(reportButton).toBeHidden();
+  await page.getByText("Lässt sich dein Finger nicht mehr ganz strecken?").click();
+  await reportButton.click();
+
+  // Hinweis auf mögliche OP, die Option zum Melden ist weg
+  await expect(notice).toBeVisible();
+  await expect(notice.getByText(/ärztlich abklären, ob du operiert werden solltest/)).toBeVisible();
+  await expect(page.getByText("Lässt sich dein Finger nicht mehr ganz strecken?")).toHaveCount(0);
+  // Bleibt nach dem Neuladen bestehen
+  await page.reload();
+  await expect(notice).toBeVisible();
+
+  // Zurücknehmen
+  await notice.getByRole("button", { name: "Meldung zurücknehmen" }).click();
+  await expect(notice).toHaveCount(0);
+  await expect(page.getByText("Lässt sich dein Finger nicht mehr ganz strecken?")).toBeVisible();
+
+  // Erneut melden, dann „Ich wurde operiert“
+  await page.getByText("Lässt sich dein Finger nicht mehr ganz strecken?").click();
+  await reportButton.click();
+  await notice.getByText("Ich wurde operiert → zu Grad IV b wechseln").click();
+  const switchButton = notice.getByRole("button", { name: "Zu Grad IV b wechseln" });
+  const alerts = page.getByRole("alert");
+
+  // Nicht vor dem Tag der Verletzung, nicht in der Zukunft
+  await notice.getByLabel("Tag der OP").fill(daysAgo(61));
+  await switchButton.click();
+  await expect(alerts.filter({ hasText: "nicht vor dem Tag der Verletzung" })).toBeVisible();
+  await notice.getByLabel("Tag der OP").fill(daysAgo(-1));
+  await switchButton.click();
+  await expect(alerts.filter({ hasText: "darf nicht in der Zukunft liegen" })).toBeVisible();
+
+  // OP vor 20 Tagen = Tag 21 = Woche 3: Ring nach der Ruhigstellung
+  await notice.getByLabel("Tag der OP").fill(daysAgo(20));
+  await switchButton.click();
+  await expect(notice).toHaveCount(0);
+
+  const todayCard = page.getByRole("region", { name: "Heute" });
+  await expect(todayCard.getByText(/^Woche 3 von 53$/)).toBeVisible();
+  await expect(
+    page.getByRole("region", { name: "Mit Operateur oder Handtherapeut klären" }),
+  ).toBeVisible();
+  // Eckpunkte von Grad IV b statt Wochenplan
+  const timeline = page.getByRole("region", { name: "Zeitleiste" });
+  await expect(timeline.locator("summary")).toHaveText([
+    /Ruhigstellung nach der OP/,
+    /Thermoplastischer Ring/,
+    /Aufbauphase – noch kein Klettern/,
+    /Leichte sportartspezifische Aktivität/,
+    /Schutzphase mit H-Tape/,
+  ]);
+  // Bei Grad IV b gibt es keine Kontraktur-Meldung
+  await expect(page.getByText("Lässt sich dein Finger nicht mehr ganz strecken?")).toHaveCount(0);
+
+  // „Verletzung ändern“ zeigt den neuen Grad und den Tag der OP
+  await page.getByRole("link", { name: "Verletzung ändern" }).click();
+  await expect(page.getByRole("radio", { name: /Grad IV b/ })).toBeChecked();
+  await expect(page.getByLabel("Tag der OP")).toHaveValue(daysAgo(20));
 });
