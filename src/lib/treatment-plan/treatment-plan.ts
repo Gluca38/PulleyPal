@@ -176,9 +176,11 @@ export function calculateTreatmentPlan(input: TreatmentPlanInput): TreatmentPlan
     { kind: "taping", content: "taping", startDate: fullClimbing, endDate: addDays(tapingEnd, -1) },
   ];
 
+  // Abschnitt 3: nach dem Ende der Schutzphase ist der Plan abgeschlossen
+  const completedDate = tapingEnd;
   const phase = phases.find((p) => today >= p.startDate && today <= p.endDate);
   if (!phase) {
-    return { phases, milestones, completedDate: tapingEnd, status: { kind: "completed" } };
+    return { phases, milestones, completedDate, status: { kind: "completed" } };
   }
 
   const nextMilestone = milestones.find((milestone) => milestone.date > today);
@@ -186,7 +188,7 @@ export function calculateTreatmentPlan(input: TreatmentPlanInput): TreatmentPlan
   return {
     phases,
     milestones,
-    completedDate: tapingEnd,
+    completedDate,
     status: {
       kind: "active",
       phase,

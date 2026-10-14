@@ -39,11 +39,15 @@ test("Neue Person erfasst Grad II und sieht die Heute-Karte", async ({ page }) =
 
   await expect(page).toHaveTitle("PulleyPal");
   await expect(page.getByRole("heading", { level: 1 })).toHaveText("PulleyPal");
-  await expect(page.getByText(/^Woche 3 von 1[34]$/)).toBeVisible();
-  await expect(page.getByRole("heading", { name: "Woche 3–4 mit Ringbandschutzring" })).toBeVisible();
-  await expect(page.getByText("Kein Klettern mit dem Ringbandschutzring")).toBeVisible();
-  await expect(page.getByText(/Leichte sportartspezifische Aktivität/)).toBeVisible();
-  await expect(page.getByText(/noch 22 Tage/)).toBeVisible();
+  // Die Zeitleiste wiederholt Phasen und Meilensteine, daher nur in der Heute-Karte suchen
+  const todayCard = page.getByRole("region", { name: "Heute" });
+  await expect(todayCard.getByText(/^Woche 3 von 1[34]$/)).toBeVisible();
+  await expect(
+    todayCard.getByRole("heading", { name: "Woche 3–4 mit Ringbandschutzring" }),
+  ).toBeVisible();
+  await expect(todayCard.getByText("Kein Klettern mit dem Ringbandschutzring")).toBeVisible();
+  await expect(todayCard.getByText(/Leichte sportartspezifische Aktivität/)).toBeVisible();
+  await expect(todayCard.getByText(/noch 22 Tage/)).toBeVisible();
 
   // Die Verletzung ist erfasst, das Formular wird nicht mehr gebraucht
   await page.goto("/verletzung");
@@ -56,9 +60,10 @@ test("Nachträglich erfasst mit 8 Wochen: direkt in der Schutzphase", async ({ p
   // Vor 60 Tagen verletzt, volle Aktivität nach 8 Wochen (Tag 57) = Woche 9
   await recordGradeTwo(page, daysAgo(60), "8 Wochen");
 
-  await expect(page.getByText(/^Woche 9 von 1[34]$/)).toBeVisible();
-  await expect(page.getByRole("heading", { name: "Schutzphase mit H-Tape" })).toBeVisible();
-  await expect(page.getByText(/Ende des H-Tape-Schutzes/)).toBeVisible();
+  const todayCard = page.getByRole("region", { name: "Heute" });
+  await expect(todayCard.getByText(/^Woche 9 von 1[34]$/)).toBeVisible();
+  await expect(todayCard.getByRole("heading", { name: "Schutzphase mit H-Tape" })).toBeVisible();
+  await expect(todayCard.getByText(/Ende des H-Tape-Schutzes/)).toBeVisible();
 });
 
 // Datum so, wie die App es auf Deutsch anzeigt, z. B. „12. Februar 2026“

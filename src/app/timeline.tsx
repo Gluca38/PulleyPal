@@ -51,10 +51,10 @@ export function Timeline({ plan }: { plan: TreatmentPlan }) {
           }
 
           const { phase } = entry;
-          const isCurrent = phase.startDate === currentPhase?.startDate;
+          const isCurrent = phase.content === currentPhase?.content;
           return (
             <li
-              key={`phase-${phase.startDate}`}
+              key={`phase-${phase.content}`}
               className="timeline-phase"
               aria-current={isCurrent ? "step" : undefined}
             >
@@ -75,7 +75,7 @@ export function Timeline({ plan }: { plan: TreatmentPlan }) {
           );
         })}
         <li
-          className="timeline-phase timeline-completed"
+          className="timeline-completed"
           aria-current={completed ? "step" : undefined}
         >
           <span className="timeline-title">{t("abgeschlossen")}</span>
