@@ -29,11 +29,14 @@ test("Neue Person erfasst Grad II und sieht die Heute-Karte", async ({ page }) =
 
   await expect(page.getByRole("heading", { level: 1 })).toHaveText("Verletzung erfassen");
   await expect(page.getByText(/PulleyPal stellt keine Diagnose/)).toBeVisible();
-  // Grad II, III und IV a sind schon auswählbar
-  await expect(page.getByRole("radio", { name: /Grad I\b/ })).toBeDisabled();
+  // Grad I bis IV a sind schon auswählbar
+  await expect(page.getByRole("radio", { name: /Grad I\b/ })).toBeEnabled();
   await expect(page.getByRole("radio", { name: /Grad III/ })).toBeEnabled();
   await expect(page.getByRole("radio", { name: /Grad IV a/ })).toBeEnabled();
-  await expect(page.getByText("folgt bald")).toHaveCount(2);
+  await expect(page.getByRole("radio", { name: /Grad IV b/ })).toBeDisabled();
+  await expect(page.getByText("folgt bald")).toHaveCount(1);
+  // Die Schutzart gibt es nur bei Grad I
+  await expect(page.getByRole("group", { name: "Verordneter Ringbandschutz" })).toHaveCount(0);
 
   // Verletzung vor 20 Tagen = Tag 21 = Woche 3
   await recordGradeTwo(page, daysAgo(20));
@@ -104,6 +107,45 @@ test("Grad IV a vor 9 Wochen: Aufbautraining, noch kein Klettern", async ({ page
     /Aufbautraining – noch kein Klettern/,
     /^Aufbautraining(?! –)/,
     /Ab 4 Monaten: Vollbelastung/,
+  ]);
+});
+
+test("Grad I mit H-Tape: Heute-Karte zeigt die H-Tape-Texte", async ({ page }) => {
+  await login(page);
+
+  await page.getByRole("radio", { name: /Grad I\b/ }).check();
+  const protection = page.getByRole("group", { name: "Verordneter Ringbandschutz" });
+  // Ohne Angabe gilt der Ring
+  await expect(protection.getByRole("radio", { name: /Ring/ })).toBeChecked();
+  await protection.getByRole("radio", { name: /H-Tape/ }).check();
+  await page.getByLabel(/Verordnete Dauer des Ringbandschutzes/).selectOption({ label: "4 Wochen" });
+
+  // Vor 14 Tagen verletzt = Tag 15 = Woche 3: Inhalt „Woche 5–6“ vorgezogen, mit H-Tape
+  await page.getByLabel("Tag der Verletzung").fill(daysAgo(14));
+  await page.getByLabel(/keine ärztliche Behandlung ersetzt/).check();
+  await page.getByRole("button", { name: "Behandlungsplan erstellen" }).click();
+  await expect(page).toHaveURL("/");
+
+  const todayCard = page.getByRole("region", { name: "Heute" });
+  await expect(todayCard.getByText(/^Woche 3 von 1[34]$/)).toBeVisible();
+  await expect(todayCard.getByRole("heading", { name: "Woche 3–4 mit H-Tape" })).toBeVisible();
+  await expect(todayCard.getByText(/Kräftigung der Finger mit H-Tape/)).toBeVisible();
+  await expect(todayCard.getByText("H-Tape tagsüber tragen")).toBeVisible();
+  const climbingFrom = formatted(daysAgo(-14));
+  await expect(
+    todayCard.getByText(`Noch kein Klettern, auch nicht mit H-Tape. Vorsichtiges Klettern erst ab ${climbingFrom}`),
+  ).toBeVisible();
+  // Keine Ring-Texte
+  await expect(todayCard.getByText(/Ringbandschutzring|Ring pro Tag/)).toHaveCount(0);
+  // Leichte Aktivität nach 4 Wochen (Tag 29) = in 14 Tagen
+  await expect(todayCard.getByText(/noch 14 Tage/)).toBeVisible();
+
+  const timeline = page.getByRole("region", { name: "Zeitleiste" });
+  await expect(timeline.locator("summary")).toHaveText([
+    /Woche 1–2 mit H-Tape/,
+    /Woche 3–4 mit H-Tape/,
+    /^Aufbautraining(?! –)/,
+    /Schutzphase mit H-Tape/,
   ]);
 });
 

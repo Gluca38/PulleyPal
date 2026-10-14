@@ -1,6 +1,6 @@
 import { getCurrentUser } from "@/lib/auth";
 import { createClient } from "@/lib/supabase/server";
-import type { Grade, IsoDate } from "@/lib/treatment-plan/treatment-plan";
+import type { Grade, IsoDate, ProtectionType } from "@/lib/treatment-plan/treatment-plan";
 
 // Die erfasste Verletzung der eingeloggten Person (Tabelle public.injuries)
 export type Injury = {
@@ -8,7 +8,17 @@ export type Injury = {
   startDate: IsoDate;
   // leer = längerer, vorsichtigerer Wert laut Behandlungsschema
   prescribedDurationWeeks: number | null;
+  // nur Grad I; leer = Ring
+  protectionType: ProtectionType | null;
 };
+
+// Schutzart im Code und in der Datenbank (Spalte protection_type)
+const PROTECTION_TYPE_IN_DB: Record<ProtectionType, string> = { ring: "ring", hTape: "h_tape" };
+
+function protectionTypeFromDb(value: string | null): ProtectionType | null {
+  const entry = Object.entries(PROTECTION_TYPE_IN_DB).find(([, inDb]) => inDb === value);
+  return entry ? (entry[0] as ProtectionType) : null;
+}
 
 // Liefert die Verletzung der eingeloggten Person oder null, wenn noch keine erfasst ist
 export async function getInjury(): Promise<Injury | null> {
@@ -16,7 +26,7 @@ export async function getInjury(): Promise<Injury | null> {
   const supabase = await createClient();
   const { data, error } = await supabase
     .from("injuries")
-    .select("grade, start_date, prescribed_duration_weeks")
+    .select("grade, start_date, prescribed_duration_weeks, protection_type")
     .eq("user_id", user.id)
     .maybeSingle();
 
@@ -31,6 +41,7 @@ export async function getInjury(): Promise<Injury | null> {
     grade: data.grade,
     startDate: data.start_date,
     prescribedDurationWeeks: data.prescribed_duration_weeks,
+    protectionType: protectionTypeFromDb(data.protection_type),
   };
 }
 
@@ -44,6 +55,7 @@ export async function createInjury(injury: Injury): Promise<CreateInjuryResult> 
     grade: injury.grade,
     start_date: injury.startDate,
     prescribed_duration_weeks: injury.prescribedDurationWeeks,
+    protection_type: injury.protectionType ? PROTECTION_TYPE_IN_DB[injury.protectionType] : null,
     disclaimer_confirmed_at: new Date().toISOString(),
   });
 

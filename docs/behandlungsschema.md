@@ -74,6 +74,8 @@ Vollbelastung, Wettkampffähigkeit. Weiterhin Taping für mindestens ein Jahr, b
 
 - Schutzart: Die Person gibt an, ob **H-Tape oder Ring** verordnet wurde (Standard: Ring), und die Dauer 2–4 Wochen (Standard: 4).
 - Bei nur 2 Wochen Schutz läuft der Inhalt „Woche 5–6“ (in Woche 3–4) **mit H-Tape** statt unter Ringbandschutz.
+- Bei 3 Wochen Schutz endet der Schutz genau nach Woche 3: Woche 3 noch mit der verordneten Schutzart, Woche 4 mit H-Tape.
+- Nach Ende des verordneten Schutzes wird das H-Tape **nur bei den Übungen** getragen, nicht mehr tagsüber. Klettern bleibt bis Woche 5 verboten.
 
 ### Ablauf nach der Ringzeit (Grad I bis IV a)
 
