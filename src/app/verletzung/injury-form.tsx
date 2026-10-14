@@ -5,6 +5,7 @@ import { useActionState, useState } from "react";
 import { useToday } from "@/lib/use-today";
 import {
   GRADES,
+  PROTECTION_TYPES,
   SUPPORTED_GRADES,
   prescribedDurationFor,
   type Grade,
@@ -79,6 +80,25 @@ export function InjuryForm() {
         />
         {errorFor("startDateMissing", "startDateInFuture")}
       </div>
+
+      {grade === "I" && (
+        <fieldset className="stack-small">
+          <legend>{t("schutzartLegende")}</legend>
+          <p className="hint">{t("schutzartHinweis")}</p>
+          {PROTECTION_TYPES.map((value) => (
+            <label key={value} className="choice">
+              <input
+                type="radio"
+                name="protectionType"
+                value={value}
+                defaultChecked={(state.values?.protectionType || "ring") === value}
+              />
+              <span>{t(`schutzart.${value}`)}</span>
+            </label>
+          ))}
+          {errorFor("protectionTypeInvalid")}
+        </fieldset>
+      )}
 
       {duration && (
         <div className="stack-small">

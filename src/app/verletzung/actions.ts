@@ -4,9 +4,11 @@ import { redirect } from "next/navigation";
 import { createInjury } from "@/lib/injury";
 import { addDays, daysBetween } from "@/lib/treatment-plan/dates";
 import {
+  PROTECTION_TYPES,
   SUPPORTED_GRADES,
   prescribedDurationFor,
   type Grade,
+  type ProtectionType,
 } from "@/lib/treatment-plan/treatment-plan";
 
 export type InjuryFormError =
@@ -15,6 +17,7 @@ export type InjuryFormError =
   | "startDateMissing"
   | "startDateInFuture"
   | "durationInvalid"
+  | "protectionTypeInvalid"
   | "confirmationMissing"
   | "saveFailed";
 
@@ -22,6 +25,7 @@ export type InjuryFormValues = {
   grade: string;
   startDate: string;
   prescribedDuration: string;
+  protectionType: string;
   confirmed: boolean;
 };
 
@@ -34,6 +38,10 @@ const ISO_DATE = /^\d{4}-\d{2}-\d{2}$/;
 
 function isGrade(value: string): value is Grade {
   return (SUPPORTED_GRADES as string[]).includes(value);
+}
+
+function isProtectionType(value: string): value is ProtectionType {
+  return (PROTECTION_TYPES as readonly string[]).includes(value);
 }
 
 // Spätester erlaubter Starttag. Das Formular schickt das heutige Datum des
@@ -61,6 +69,7 @@ export async function saveInjury(
     grade: String(formData.get("grade") ?? ""),
     startDate: String(formData.get("startDate") ?? ""),
     prescribedDuration: String(formData.get("prescribedDuration") ?? ""),
+    protectionType: String(formData.get("protectionType") ?? ""),
     confirmed: formData.get("confirmed") === "on",
   };
   const errors: InjuryFormError[] = [];
@@ -85,6 +94,18 @@ export async function saveInjury(
     }
   }
 
+  // Schutzart nur bei Grad I; ohne Angabe gilt der Ring
+  let protectionType: ProtectionType | null = null;
+  if (values.grade === "I") {
+    if (!values.protectionType) {
+      protectionType = "ring";
+    } else if (isProtectionType(values.protectionType)) {
+      protectionType = values.protectionType;
+    } else {
+      errors.push("protectionTypeInvalid");
+    }
+  }
+
   if (!values.confirmed) {
     errors.push("confirmationMissing");
   }
@@ -97,6 +118,7 @@ export async function saveInjury(
     grade: values.grade,
     startDate: values.startDate,
     prescribedDurationWeeks,
+    protectionType,
   });
   if (result === "error") {
     return { errors: ["saveFailed"], values };

@@ -48,7 +48,14 @@
     "folgtBald": "folgt bald",
     "starttagLabel": "Tag der Verletzung",
     "starttagHinweis": "Ab diesem Tag zählen die Wochen deines Behandlungsplans. Du kannst ihn auch nachträglich eingeben.",
+    "schutzartLegende": "Verordneter Ringbandschutz",
+    "schutzartHinweis": "Wähle, was deine Ärztin oder dein Arzt verordnet hat. Ohne Angabe gilt der Ring.",
+    "schutzart": {
+      "ring": "Thermoplastischer Ring (Ringbandschutzring)",
+      "hTape": "H-Tape (tagsüber)"
+    },
     "dauerLabel": {
+      "I": "Verordnete Dauer des Ringbandschutzes (optional)",
       "II": "Verordnete Dauer bis zur vollen sportartspezifischen Aktivität (optional)",
       "III": "Verordnete Dauer des Ringbandschutzrings (optional)"
     },
@@ -64,6 +71,7 @@
       "startDateMissing": "Bitte gib den Tag der Verletzung ein.",
       "startDateInFuture": "Der Tag der Verletzung darf nicht in der Zukunft liegen.",
       "durationInvalid": "Bitte wähle eine der angebotenen Dauern.",
+      "protectionTypeInvalid": "Bitte wähle Ring oder H-Tape.",
       "confirmationMissing": "Bitte bestätige, dass PulleyPal keine ärztliche Behandlung ersetzt.",
       "saveFailed": "Deine Angaben konnten gerade nicht gespeichert werden. Bitte versuche es noch einmal."
     }
@@ -93,6 +101,38 @@
         "name": "Woche 7–8 mit Ringbandschutzring",
         "inhalt": "Weitere Steigerung der Belastung der beiden Wochen zuvor unter Ringbandschutz."
       },
+      "gradeOneWeek1to2Ring": {
+        "name": "Woche 1–2 mit Ringbandschutzring",
+        "inhalt": "Isometrie, Krankengymnastik/Ergotherapie. Vorsichtige geführte exzentrische Übungen mit minimalem Widerstand. Freies Bewegen im Alltag."
+      },
+      "gradeOneWeek1to2HTape": {
+        "name": "Woche 1–2 mit H-Tape",
+        "inhalt": "Isometrie, Krankengymnastik/Ergotherapie. Vorsichtige geführte exzentrische Übungen mit minimalem Widerstand. Freies Bewegen im Alltag."
+      },
+      "gradeOneWeek3to4Ring": {
+        "name": "Woche 3–4 mit Ringbandschutzring",
+        "inhalt": "Vorsichtige konzentrische Kräftigung der Finger unter Ringbandschutz, z. B. mit Gogor (Muskers Climbing), unter schrittweiser Steigerung des Widerstands: mit den schwächsten Federn beginnen, dann langsam steigern. Zusätzlich leichte statische Halteübungen an der Griffleiste, aber noch kein Hängen am Griffboard. Direkten Druck auf das verletzte Ringband vermeiden (Klimmzugstange!)."
+      },
+      "gradeOneWeek3to4HTape": {
+        "name": "Woche 3–4 mit H-Tape",
+        "inhalt": "Vorsichtige konzentrische Kräftigung der Finger mit H-Tape, z. B. mit Gogor (Muskers Climbing), unter schrittweiser Steigerung des Widerstands: mit den schwächsten Federn beginnen, dann langsam steigern. Zusätzlich leichte statische Halteübungen an der Griffleiste, aber noch kein Hängen am Griffboard. Direkten Druck auf das verletzte Ringband vermeiden (Klimmzugstange!)."
+      },
+      "gradeOneWeek3to4HTapeForExercises": {
+        "name": "Woche 3–4: Übungen mit H-Tape",
+        "inhalt": "Vorsichtige konzentrische Kräftigung der Finger mit H-Tape, z. B. mit Gogor (Muskers Climbing), unter schrittweiser Steigerung des Widerstands: mit den schwächsten Federn beginnen, dann langsam steigern. Zusätzlich leichte statische Halteübungen an der Griffleiste, aber noch kein Hängen am Griffboard. Direkten Druck auf das verletzte Ringband vermeiden (Klimmzugstange!)."
+      },
+      "gradeOneWeek3Ring": {
+        "name": "Woche 3 mit Ringbandschutzring",
+        "inhalt": "Vorsichtige konzentrische Kräftigung der Finger unter Ringbandschutz, z. B. mit Gogor (Muskers Climbing), unter schrittweiser Steigerung des Widerstands: mit den schwächsten Federn beginnen, dann langsam steigern. Zusätzlich leichte statische Halteübungen an der Griffleiste, aber noch kein Hängen am Griffboard. Direkten Druck auf das verletzte Ringband vermeiden (Klimmzugstange!)."
+      },
+      "gradeOneWeek3HTape": {
+        "name": "Woche 3 mit H-Tape",
+        "inhalt": "Vorsichtige konzentrische Kräftigung der Finger mit H-Tape, z. B. mit Gogor (Muskers Climbing), unter schrittweiser Steigerung des Widerstands: mit den schwächsten Federn beginnen, dann langsam steigern. Zusätzlich leichte statische Halteübungen an der Griffleiste, aber noch kein Hängen am Griffboard. Direkten Druck auf das verletzte Ringband vermeiden (Klimmzugstange!)."
+      },
+      "gradeOneWeek4HTapeForExercises": {
+        "name": "Woche 4: Übungen mit H-Tape",
+        "inhalt": "Vorsichtige konzentrische Kräftigung der Finger mit H-Tape, z. B. mit Gogor (Muskers Climbing), unter schrittweiser Steigerung des Widerstands: mit den schwächsten Federn beginnen, dann langsam steigern. Zusätzlich leichte statische Halteübungen an der Griffleiste, aber noch kein Hängen am Griffboard. Direkten Druck auf das verletzte Ringband vermeiden (Klimmzugstange!)."
+      },
       "rebuildBeforeClimbing": {
         "name": "Aufbautraining – noch kein Klettern",
         "inhalt": "Vorsichtige Hängeübungen am Griffboard mit Slopergriffen und Entlastung durch ein Elastikband, Klimmzüge an der Stange mit H-Tape. Noch kein Klettern: Vorsichtiges Klettern mit H-Tape beginnt erst mit der leichten sportartspezifischen Aktivität."
@@ -100,6 +140,10 @@
       "rebuild": {
         "name": "Aufbautraining",
         "inhalt": "Vorsichtige Hängeübungen am Griffboard mit Slopergriffen und Entlastung durch ein Elastikband, Klimmzüge an der Stange mit H-Tape. Beginn vorsichtiges Klettern, Belastungssteigerung bis zur absoluten Vollbelastung über 4–6 Wochen. Ringbandschutz: H-Tape."
+      },
+      "gradeOneRebuild": {
+        "name": "Aufbautraining",
+        "inhalt": "Vorsichtige Hängeübungen am Griffboard mit Slopergriffen und Entlastung durch ein Elastikband, Klimmzüge an der Stange mit H-Tape. Beginn vorsichtiges Klettern, Belastung in diesen zwei Wochen langsam steigern; volle sportartspezifische Aktivität ab Woche 7. Ringbandschutz: H-Tape."
       },
       "taping": {
         "name": "Schutzphase mit H-Tape",
@@ -118,6 +162,9 @@
     "regel": {
       "noClimbingWithSplint": "Kein Klettern mit dem Ringbandschutzring (erhebliche Verletzungsgefahr!)",
       "removeSplintDaily": "Ring pro Tag eine Stunde abnehmen und die Haut einfetten (Panthenolsalbe). Ring mit Tape anspannen.",
+      "noClimbingBeforeLightClimbing": "Noch kein Klettern, auch nicht mit H-Tape. Vorsichtiges Klettern erst ab {datum}",
+      "wearHTapeDuringDay": "H-Tape tagsüber tragen",
+      "hTapeForExercises": "Der verordnete Schutz ist vorbei: H-Tape bei den Übungen tragen",
       "unspecificTraining": "Unspezifisches Training und allgemeines Krafttraining unter Schonung des verletzten Fingers",
       "noHangingWithSplint": "Keine Hängeübungen mit Ringbandschutzring!",
       "noClimbingYet": "Noch kein Klettern: bis dahin nur Hängeübungen, Entlastung mit Elastikband und Klimmzüge mit H-Tape",

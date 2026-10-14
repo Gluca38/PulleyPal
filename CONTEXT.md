@@ -34,7 +34,7 @@ Ein Zeitabschnitt im Behandlungsplan mit eigenen Aufgaben und Regeln, z. B. „W
 _Avoid_: Periode, Stufe, Abschnitt
 
 **Ring-Phase** (`splintPhase`):
-Eine Phase, in der der Ringbandschutz (Ring oder bei Grad I ggf. H-Tape) getragen wird und der Wochenplan gilt. Klettern ist verboten.
+Eine Phase, in der der Ringbandschutz (Ring oder bei Grad I ggf. H-Tape) getragen wird und der Wochenplan gilt. Klettern ist verboten. Bei Grad I zählen auch die Wochen nach Ende des verordneten Schutzes bis Woche 4 dazu (Übungen mit H-Tape).
 
 **Aufbautraining** (`rebuildPhase`):
 Die Phase vom Ende der Ringzeit bis zur vollen sportartspezifischen Aktivität. Klettern erst ab dem Meilenstein „leichte sportartspezifische Aktivität“. Liegt dieser nach dem Ende der Ringzeit (z. B. Grad IV a, Woche 9–10), ist das Aufbautraining in zwei Phasen geteilt: erst **noch kein Klettern** (`rebuildBeforeClimbing`), dann mit vorsichtigem Klettern.
@@ -65,7 +65,7 @@ _Avoid_: Vollbelastung
 Die vom Arzt oder der Ärztin festgelegte Dauer innerhalb einer Spanne des Behandlungsschemas (z. B. 6 oder 8 Wochen Ring bei Grad III). Ohne Angabe gilt der längere Wert.
 
 **Schutzart** (`protectionType`):
-Bei Grad I die verordnete Art des Ringbandschutzes: H-Tape oder thermoplastischer Ring.
+Bei Grad I die verordnete Art des Ringbandschutzes: H-Tape (`hTape`) oder thermoplastischer Ring (`ring`). Nach Ende des verordneten Schutzes wird H-Tape nur noch bei den Übungen getragen (`hTapeForExercises`).
 
 **Kontraktur** (`contracture`):
 Der Finger lässt sich im Mittelgelenk (PIP) um mehr als 20° nicht strecken. Bei Grad IV a von der Person optional gemeldet; führt zum Hinweis auf eine mögliche OP.

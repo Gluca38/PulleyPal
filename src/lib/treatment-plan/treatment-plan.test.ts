@@ -341,3 +341,195 @@ describe("Grad IV a", () => {
     expect(gradeFourA("2027-01-01").status).toEqual({ kind: "completed", permanentTaping: true });
   });
 });
+
+function gradeOne(today: string, overrides: Partial<TreatmentPlanInput> = {}) {
+  return calculateTreatmentPlan({ grade: "I", startDate: "2026-01-01", today, ...overrides });
+}
+
+describe("Grad I", () => {
+  it("Abschnitt 1 und 3: Schutz 2, 3 oder 4 Wochen, ohne Angabe 4", () => {
+    expect(prescribedDurationFor("I")).toEqual({ options: [2, 3, 4], default: 4 });
+  });
+
+  // Starttag 1. Januar: 4 Wochen = ab 29.1., 6 Wochen = ab 12.2., 3 Monate = ab 1.4.
+  it.each([
+    { schutzart: "ring", dauer: 4, phase: "gradeOneWeek1to2Ring", danach: "gradeOneWeek3to4Ring" },
+    { schutzart: "ring", dauer: null, phase: "gradeOneWeek1to2Ring", danach: "gradeOneWeek3to4Ring" },
+    { schutzart: null, dauer: null, phase: "gradeOneWeek1to2Ring", danach: "gradeOneWeek3to4Ring" },
+    { schutzart: "hTape", dauer: 4, phase: "gradeOneWeek1to2HTape", danach: "gradeOneWeek3to4HTape" },
+  ] as const)(
+    "Abschnitt 3, Grad I: Schutzart $schutzart, $dauer Wochen: Inhalte „Woche 3–4“ und „Woche 5–6“ vorgezogen in Woche 1–4",
+    ({ schutzart, dauer, phase, danach }) => {
+      const plan = gradeOne("2026-01-01", { protectionType: schutzart, prescribedDurationWeeks: dauer });
+
+      expect(phaseOverview(plan)).toEqual([
+        `${phase}: 2026-01-01 – 2026-01-14`,
+        `${danach}: 2026-01-15 – 2026-01-28`,
+        "gradeOneRebuild: 2026-01-29 – 2026-02-11",
+        "taping: 2026-02-12 – 2026-03-31",
+      ]);
+    },
+  );
+
+  it.each([
+    { schutzart: "ring", phase: "gradeOneWeek1to2Ring" },
+    { schutzart: "hTape", phase: "gradeOneWeek1to2HTape" },
+  ] as const)(
+    "Abschnitt 3, Grad I: bei 2 Wochen Schutz ($schutzart) läuft Woche 3–4 mit H-Tape bei den Übungen",
+    ({ schutzart, phase }) => {
+      const plan = gradeOne("2026-01-01", { protectionType: schutzart, prescribedDurationWeeks: 2 });
+
+      expect(phaseOverview(plan)).toEqual([
+        `${phase}: 2026-01-01 – 2026-01-14`,
+        "gradeOneWeek3to4HTapeForExercises: 2026-01-15 – 2026-01-28",
+        "gradeOneRebuild: 2026-01-29 – 2026-02-11",
+        "taping: 2026-02-12 – 2026-03-31",
+      ]);
+    },
+  );
+
+  // Abschnitt 3, Grad I: Der Schutz endet genau nach der verordneten Dauer
+  it.each([
+    { schutzart: "ring", phase: "gradeOneWeek1to2Ring", woche3: "gradeOneWeek3Ring" },
+    { schutzart: "hTape", phase: "gradeOneWeek1to2HTape", woche3: "gradeOneWeek3HTape" },
+  ] as const)(
+    "Abschnitt 3, Grad I: bei 3 Wochen Schutz ($schutzart) Woche 3 mit Schutz, Woche 4 mit H-Tape bei den Übungen",
+    ({ schutzart, phase, woche3 }) => {
+      const plan = gradeOne("2026-01-01", { protectionType: schutzart, prescribedDurationWeeks: 3 });
+
+      expect(phaseOverview(plan)).toEqual([
+        `${phase}: 2026-01-01 – 2026-01-14`,
+        `${woche3}: 2026-01-15 – 2026-01-21`,
+        "gradeOneWeek4HTapeForExercises: 2026-01-22 – 2026-01-28",
+        "gradeOneRebuild: 2026-01-29 – 2026-02-11",
+        "taping: 2026-02-12 – 2026-03-31",
+      ]);
+    },
+  );
+
+  it.each([
+    { today: "2026-01-14", week: 2, content: "gradeOneWeek1to2Ring", grenze: "letzter Tag Woche 1–2" },
+    { today: "2026-01-15", week: 3, content: "gradeOneWeek3Ring", grenze: "erster Tag Woche 3" },
+    { today: "2026-01-21", week: 3, content: "gradeOneWeek3Ring", grenze: "letzter Tag Woche 3" },
+    { today: "2026-01-22", week: 4, content: "gradeOneWeek4HTapeForExercises", grenze: "erster Tag Woche 4" },
+    { today: "2026-01-28", week: 4, content: "gradeOneWeek4HTapeForExercises", grenze: "letzter Tag Woche 4" },
+  ])("Phasengrenzen bei 3 Wochen Ring: $grenze", ({ today, week, content }) => {
+    const { status } = gradeOne(today, { protectionType: "ring", prescribedDurationWeeks: 3 });
+
+    if (status.kind !== "active") throw new Error("Plan sollte laufen");
+    expect(status.week).toBe(week);
+    expect(status.phase).toMatchObject({ kind: "splint", content });
+  });
+
+  it.each([
+    { today: "2026-01-14", week: 2, content: "gradeOneWeek1to2HTape", grenze: "letzter Tag Woche 1–2" },
+    { today: "2026-01-15", week: 3, content: "gradeOneWeek3to4HTapeForExercises", grenze: "erster Tag Woche 3–4" },
+    { today: "2026-01-28", week: 4, content: "gradeOneWeek3to4HTapeForExercises", grenze: "letzter Tag Woche 3–4" },
+  ])("Phasengrenzen bei 2 Wochen H-Tape: $grenze", ({ today, week, content }) => {
+    const { status } = gradeOne(today, { protectionType: "hTape", prescribedDurationWeeks: 2 });
+
+    if (status.kind !== "active") throw new Error("Plan sollte laufen");
+    expect(status.week).toBe(week);
+    expect(status.phase).toMatchObject({ kind: "splint", content });
+  });
+
+  it.each([
+    { today: "2026-01-28", week: 4, kind: "splint", grenze: "letzter Tag mit Schutz" },
+    { today: "2026-01-29", week: 5, kind: "rebuild", grenze: "Klettern ab Woche 5" },
+    { today: "2026-02-11", week: 6, kind: "rebuild", grenze: "letzter Tag Aufbautraining" },
+    { today: "2026-02-12", week: 7, kind: "taping", grenze: "volle Aktivität nach 6 Wochen" },
+    { today: "2026-03-31", week: 13, kind: "taping", grenze: "letzter Tag H-Tape-Schutz" },
+  ])("Phasengrenzen nach dem Schutz: $grenze", ({ today, week, kind }) => {
+    const { status } = gradeOne(today);
+
+    if (status.kind !== "active") throw new Error("Plan sollte laufen");
+    expect(status.week).toBe(week);
+    expect(status.phase.kind).toBe(kind);
+  });
+
+  it("Abschnitt 1 und 3, Grad I: Meilensteine nach 4 Wochen, 6 Wochen und 3 Monaten, unabhängig vom Schutz", () => {
+    const expected = [
+      { kind: "lightClimbing", date: "2026-01-29" },
+      { kind: "fullClimbing", date: "2026-02-12" },
+      { kind: "tapingEnd", date: "2026-04-01" },
+    ];
+    expect(gradeOne("2026-01-01").milestones).toEqual(expected);
+    expect(
+      gradeOne("2026-01-01", { protectionType: "hTape", prescribedDurationWeeks: 2 }).milestones,
+    ).toEqual(expected);
+  });
+
+  it("Abschnitt 2, Ringbandschutzring: mit Ring kein Klettern, Ring täglich eine Stunde abnehmen", () => {
+    const { status } = gradeOne("2026-01-01", { protectionType: "ring" });
+
+    if (status.kind !== "active") throw new Error("Plan sollte laufen");
+    expect(status.phase).toMatchObject({ kind: "splint", protection: "ring" });
+    expect(status.rules).toEqual([
+      { key: "noClimbingWithSplint", type: "forbidden" },
+      { key: "removeSplintDaily", type: "reminder" },
+      { key: "unspecificTraining", type: "allowed" },
+    ]);
+  });
+
+  it("Abschnitt 1, Grad I: mit H-Tape tagsüber tragen, Klettern erst ab Woche 5", () => {
+    const { status } = gradeOne("2026-01-15", { protectionType: "hTape" });
+
+    if (status.kind !== "active") throw new Error("Plan sollte laufen");
+    expect(status.phase).toMatchObject({ kind: "splint", protection: "hTape" });
+    expect(status.rules).toEqual([
+      { key: "noClimbingBeforeLightClimbing", type: "forbidden", date: "2026-01-29" },
+      { key: "wearHTapeDuringDay", type: "reminder" },
+      { key: "unspecificTraining", type: "allowed" },
+    ]);
+  });
+
+  it("Abschnitt 3, Grad I: nach dem Schutz H-Tape bei den Übungen, Klettern erst ab Woche 5", () => {
+    const { status } = gradeOne("2026-01-15", { protectionType: "ring", prescribedDurationWeeks: 2 });
+
+    if (status.kind !== "active") throw new Error("Plan sollte laufen");
+    expect(status.phase).toMatchObject({ kind: "splint", protection: "hTapeForExercises" });
+    expect(status.rules).toEqual([
+      { key: "noClimbingBeforeLightClimbing", type: "forbidden", date: "2026-01-29" },
+      { key: "hTapeForExercises", type: "reminder" },
+      { key: "unspecificTraining", type: "allowed" },
+    ]);
+  });
+
+  it("Abschnitt 3, Grad I: in Woche 5 vorsichtiges Klettern mit H-Tape", () => {
+    const { status } = gradeOne("2026-01-29");
+
+    if (status.kind !== "active") throw new Error("Plan sollte laufen");
+    expect(status.phase.content).toBe("gradeOneRebuild");
+    expect(status.rules).toContainEqual({ key: "carefulClimbingWithTape", type: "allowed" });
+    expect(status.nextMilestone).toMatchObject({ kind: "fullClimbing", date: "2026-02-12" });
+  });
+
+  it("Abschnitt 3, Grad I: „Ab 4 Monaten“ gilt nicht, Schutzphase mit H-Tape bis 3 Monate", () => {
+    const { status } = gradeOne("2026-02-12");
+
+    if (status.kind !== "active") throw new Error("Plan sollte laufen");
+    expect(status.phase).toMatchObject({ kind: "taping", content: "taping" });
+    expect(status.rules).toEqual([
+      { key: "fullClimbingWithTape", type: "allowed", date: "2026-03-31" },
+    ]);
+    expect(status.totalWeeks).toBe(13);
+  });
+
+  it.each([{ schutzart: "ring" }, { schutzart: "hTape" }] as const)(
+    "Abschnitt 1 und 3, Grad I ($schutzart): nach 3 Monaten abgeschlossen, ohne Dauer-Tape-Empfehlung",
+    ({ schutzart }) => {
+      expect(gradeOne("2026-03-31", { protectionType: schutzart }).status.kind).toBe("active");
+      expect(gradeOne("2026-04-01", { protectionType: schutzart }).status).toEqual({
+        kind: "completed",
+        permanentTaping: false,
+      });
+    },
+  );
+
+  it("Andere Grade: Ring-Phasen tragen den Ringbandschutzring", () => {
+    const { status } = gradeTwo("2026-01-01");
+
+    if (status.kind !== "active") throw new Error("Plan sollte laufen");
+    expect(status.phase).toMatchObject({ kind: "splint", protection: "ring" });
+  });
+});
