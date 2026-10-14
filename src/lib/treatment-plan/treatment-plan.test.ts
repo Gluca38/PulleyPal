@@ -142,12 +142,12 @@ describe("Grad II", () => {
     ]);
   });
 
-  it("Abschnitt 1, H-Tape-Schutz: in der Schutzphase volles Klettern mit H-Tape bis zum H-Tape-Ende", () => {
+  it("Abschnitt 1, H-Tape-Schutz: in der Schutzphase volles Klettern mit H-Tape bis zum letzten Tag der Schutzphase", () => {
     const { status } = gradeTwo("2026-03-12");
 
     if (status.kind !== "active") throw new Error("Plan sollte laufen");
     expect(status.rules).toEqual([
-      { key: "fullClimbingWithTape", type: "allowed", date: "2026-04-01" },
+      { key: "fullClimbingWithTape", type: "allowed", date: "2026-03-31" },
     ]);
   });
 

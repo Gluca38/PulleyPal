@@ -128,7 +128,8 @@ function rulesFor(phase: Phase, today: IsoDate, lightClimbing: IsoDate, tapingEn
         unspecificTraining,
       ];
     case "taping":
-      return [{ key: "fullClimbingWithTape", type: "allowed", date: tapingEnd }];
+      // Datum = letzter Tag mit H-Tape-Schutz
+      return [{ key: "fullClimbingWithTape", type: "allowed", date: addDays(tapingEnd, -1) }];
   }
 }
 

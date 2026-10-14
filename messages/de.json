@@ -102,7 +102,7 @@
       "noHangingWithSplint": "Keine Hängeübungen mit Ringbandschutzring!",
       "noClimbingYet": "Noch kein Klettern: bis dahin nur Hängeübungen, Entlastung mit Elastikband und Klimmzüge mit H-Tape",
       "carefulClimbingWithTape": "Vorsichtiges Klettern mit H-Tape, Belastung langsam steigern",
-      "fullClimbingWithTape": "Uneingeschränkt klettern, dabei H-Tape tragen, bis der Schutz am {datum} endet"
+      "fullClimbingWithTape": "Uneingeschränkt klettern, dabei H-Tape tragen bis einschließlich {datum}"
     },
     "naechsterMeilenstein": "Nächster Meilenstein",
     "meilenstein": {
