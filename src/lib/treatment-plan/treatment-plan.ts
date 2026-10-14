@@ -59,6 +59,8 @@ export type TodayStatus =
 export type TreatmentPlan = {
   phases: Phase[];
   milestones: Milestone[];
+  // Tag, ab dem der Plan abgeschlossen ist (nach dem Ende der Schutzphase)
+  completedDate: IsoDate;
   status: TodayStatus;
 };
 
@@ -176,7 +178,7 @@ export function calculateTreatmentPlan(input: TreatmentPlanInput): TreatmentPlan
 
   const phase = phases.find((p) => today >= p.startDate && today <= p.endDate);
   if (!phase) {
-    return { phases, milestones, status: { kind: "completed" } };
+    return { phases, milestones, completedDate: tapingEnd, status: { kind: "completed" } };
   }
 
   const nextMilestone = milestones.find((milestone) => milestone.date > today);
@@ -184,6 +186,7 @@ export function calculateTreatmentPlan(input: TreatmentPlanInput): TreatmentPlan
   return {
     phases,
     milestones,
+    completedDate: tapingEnd,
     status: {
       kind: "active",
       phase,

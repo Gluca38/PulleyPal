@@ -159,6 +159,10 @@ describe("Grad II", () => {
     expect(gradeTwo("2026-04-01").status.kind).toBe("completed");
   });
 
+  it("Abschnitt 3: der Plan nennt den Tag, ab dem er abgeschlossen ist", () => {
+    expect(gradeTwo("2026-01-01").completedDate).toBe("2026-04-01");
+  });
+
   it("Abschnitt 3: ein Starttag weit in der Vergangenheit ergibt Abgeschlossen", () => {
     expect(gradeTwo("2027-06-01").status.kind).toBe("completed");
   });
