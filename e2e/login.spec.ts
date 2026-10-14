@@ -38,7 +38,10 @@ test("Schon benutzter Link zeigt Hinweis und erlaubt neuen Link", async ({ page,
   await guest.goto(link);
 
   await expect(guest).toHaveURL("/login?fehler=link-ungueltig");
-  await expect(guest.getByRole("alert")).toContainText("abgelaufen oder wurde schon benutzt");
+  // Next.js hat selbst ein unsichtbares Element mit dieser Rolle, daher nach Text filtern
+  await expect(
+    guest.getByRole("alert").filter({ hasText: "abgelaufen oder wurde schon benutzt" }),
+  ).toBeVisible();
   await expect(guest.getByRole("button", { name: "Login-Link senden" })).toBeVisible();
   await guest.close();
 });
