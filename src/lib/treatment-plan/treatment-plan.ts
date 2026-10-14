@@ -87,7 +87,7 @@ type GradeRules = {
     lightClimbing: After;
     fullClimbing: After;
     tapingEnd: After;
-    tapingPhase: "taping" | "tapingFullLoad";
+    tapingContent: "taping" | "tapingFullLoad";
     permanentTaping: boolean;
   };
 };
@@ -103,7 +103,7 @@ const GRADE_RULES: Partial<Record<Grade, GradeRules>> = {
       lightClimbing: { weeks: 6 },
       fullClimbing: { weeks: prescribedWeeks ?? 10 },
       tapingEnd: { months: 3 },
-      tapingPhase: "taping",
+      tapingContent: "taping",
       permanentTaping: false,
     }),
   },
@@ -120,7 +120,7 @@ const GRADE_RULES: Partial<Record<Grade, GradeRules>> = {
       // Abschnitt 3: Für Grad III gilt die Tabelle, nicht „Ab 4 Monaten“
       fullClimbing: { months: 3 },
       tapingEnd: { months: 6 },
-      tapingPhase: "taping",
+      tapingContent: "taping",
       permanentTaping: false,
     }),
   },
@@ -134,7 +134,7 @@ const GRADE_RULES: Partial<Record<Grade, GradeRules>> = {
       fullClimbing: { months: 4 },
       // Abschnitt 1: H-Tape-Schutz > 12 Monate; Abschnitt 3: danach dauerhaft tapen
       tapingEnd: { months: 12 },
-      tapingPhase: "tapingFullLoad",
+      tapingContent: "tapingFullLoad",
       permanentTaping: true,
     }),
   },
@@ -221,9 +221,10 @@ export function calculateTreatmentPlan(input: TreatmentPlanInput): TreatmentPlan
 
   // Abschnitt 3: Liegt die leichte sportartspezifische Aktivität nach dem Ende
   // der Ringzeit, gibt es bis dahin Aufbautraining noch ohne Klettern
-  const climbingStart = lightClimbing > splintEnd ? lightClimbing : splintEnd;
+  const hasGap = lightClimbing > splintEnd;
+  const climbingStart = hasGap ? lightClimbing : splintEnd;
   const rebuildBeforeClimbing: Phase[] =
-    climbingStart > splintEnd
+    hasGap
       ? [
           {
             kind: "rebuild",
@@ -246,7 +247,7 @@ export function calculateTreatmentPlan(input: TreatmentPlanInput): TreatmentPlan
     },
     {
       kind: "taping",
-      content: plan.tapingPhase,
+      content: plan.tapingContent,
       startDate: fullClimbing,
       endDate: addDays(tapingEnd, -1),
     },
