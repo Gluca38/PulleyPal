@@ -1,4 +1,6 @@
 import { useTranslations } from "next-intl";
+import { getTranslations } from "next-intl/server";
+import Link from "next/link";
 import { redirect } from "next/navigation";
 import { Suspense } from "react";
 import { AccountBar } from "@/app/account-bar";
@@ -28,5 +30,15 @@ async function OverviewForInjury() {
   if (!injury) {
     redirect("/verletzung");
   }
-  return <TreatmentOverview injury={injury} />;
+  const t = await getTranslations("Startseite");
+  return (
+    <>
+      <TreatmentOverview injury={injury} />
+      <p>
+        <Link href="/verletzung/aendern" className="text-link">
+          {t("verletzungAendern")}
+        </Link>
+      </p>
+    </>
+  );
 }

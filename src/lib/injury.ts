@@ -70,3 +70,30 @@ export async function createInjury(injury: Injury): Promise<CreateInjuryResult> 
   console.error("Verletzung konnte nicht gespeichert werden:", error.message);
   return "error";
 }
+
+export type UpdateInjuryResult = "updated" | "notFound" | "error";
+
+// Überschreibt die Verletzung der eingeloggten Person (kein Verlauf). Die
+// Bestätigung vom Erfassen bleibt bestehen. Eine gemeldete Kontraktur gibt es
+// nur bei Grad IV a und entfällt bei einem anderen Grad.
+export async function updateInjury(injury: Injury): Promise<UpdateInjuryResult> {
+  const user = await getCurrentUser();
+  const supabase = await createClient();
+  const { data, error } = await supabase
+    .from("injuries")
+    .update({
+      grade: injury.grade,
+      start_date: injury.startDate,
+      prescribed_duration_weeks: injury.prescribedDurationWeeks,
+      protection_type: injury.protectionType ? PROTECTION_TYPE_IN_DB[injury.protectionType] : null,
+      ...(injury.grade === "IVa" ? {} : { contracture_reported_at: null }),
+    })
+    .eq("user_id", user.id)
+    .select("user_id");
+
+  if (error) {
+    console.error("Verletzung konnte nicht geändert werden:", error.message);
+    return "error";
+  }
+  return data.length > 0 ? "updated" : "notFound";
+}

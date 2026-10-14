@@ -334,3 +334,8 @@ button:disabled {
   background: var(--accent);
   color: var(--background);
 }
+
+.text-link {
+  color: var(--accent);
+  text-decoration: underline;
+}

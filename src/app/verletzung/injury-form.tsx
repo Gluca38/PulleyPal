@@ -10,15 +10,38 @@ import {
   prescribedDurationFor,
   type Grade,
 } from "@/lib/treatment-plan/treatment-plan";
-import { saveInjury, type InjuryFormError, type InjuryFormState } from "./actions";
+import { changeInjury, saveInjury } from "./actions";
+import type { InjuryFormError, InjuryFormState, InjuryFormValues } from "./validate-injury-form";
 
 const initialState: InjuryFormState = { errors: [] };
 
-export function InjuryForm() {
+const emptyValues: InjuryFormValues = {
+  grade: "",
+  startDate: "",
+  prescribedDuration: "",
+  protectionType: "",
+  confirmed: false,
+};
+
+// Erfassen (create) oder Ändern (change) der Verletzung. Beim Ändern ist das
+// Formular mit den gespeicherten Werten vorausgefüllt und die Bestätigung
+// „ersetzt keine ärztliche Behandlung“ wird nicht erneut verlangt.
+export function InjuryForm({
+  mode,
+  savedValues = emptyValues,
+}: {
+  mode: "create" | "change";
+  savedValues?: InjuryFormValues;
+}) {
   const t = useTranslations("Verletzung");
   const today = useToday();
-  const [state, formAction, pending] = useActionState(saveInjury, initialState);
-  const [grade, setGrade] = useState(state.values?.grade ?? "");
+  const [state, formAction, pending] = useActionState(
+    mode === "create" ? saveInjury : changeInjury,
+    initialState,
+  );
+  // Nach einem Fehler zeigt das Formular die zuletzt abgeschickten Werte
+  const values = state.values ?? savedValues;
+  const [grade, setGrade] = useState(values.grade);
   const duration = isGrade(grade) ? prescribedDurationFor(grade) : null;
 
   function errorFor(...codes: InjuryFormError[]) {
@@ -68,7 +91,7 @@ export function InjuryForm() {
           name="startDate"
           type="date"
           max={today ?? undefined}
-          defaultValue={state.values?.startDate}
+          defaultValue={values.startDate}
           aria-describedby="startDate-hint"
         />
         {errorFor("startDateMissing", "startDateInFuture")}
@@ -84,7 +107,7 @@ export function InjuryForm() {
                 type="radio"
                 name="protectionType"
                 value={value}
-                defaultChecked={(state.values?.protectionType || "ring") === value}
+                defaultChecked={(values.protectionType || "ring") === value}
               />
               <span>{t(`schutzart.${value}`)}</span>
             </label>
@@ -99,10 +122,12 @@ export function InjuryForm() {
           <p className="hint" id="prescribedDuration-hint">
             {t("dauerHinweis")}
           </p>
+          {/* Die Dauern gelten je Grad: bei einem anderen Grad wieder „Keine Angabe“ */}
           <select
+            key={grade}
             id="prescribedDuration"
             name="prescribedDuration"
-            defaultValue={state.values?.prescribedDuration ?? ""}
+            defaultValue={grade === values.grade ? values.prescribedDuration : ""}
             aria-describedby="prescribedDuration-hint"
           >
             <option value="">{t("dauerKeineAngabe", { wochen: duration.default })}</option>
@@ -116,17 +141,19 @@ export function InjuryForm() {
         </div>
       )}
 
-      <div className="stack-small">
-        <label className="choice">
-          <input type="checkbox" name="confirmed" defaultChecked={state.values?.confirmed} />
-          <span>{t("bestaetigung")}</span>
-        </label>
-        {errorFor("confirmationMissing")}
-      </div>
+      {mode === "create" && (
+        <div className="stack-small">
+          <label className="choice">
+            <input type="checkbox" name="confirmed" defaultChecked={values.confirmed} />
+            <span>{t("bestaetigung")}</span>
+          </label>
+          {errorFor("confirmationMissing")}
+        </div>
+      )}
 
       {errorFor("saveFailed")}
       <button type="submit" disabled={pending}>
-        {pending ? t("speichert") : t("speichern")}
+        {pending ? t("speichert") : t(mode === "create" ? "speichern" : "aenderungSpeichern")}
       </button>
     </form>
   );
