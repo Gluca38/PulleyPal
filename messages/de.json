@@ -1,7 +1,8 @@
 {
   "Startseite": {
     "titel": "PulleyPal",
-    "beschreibung": "Begleitet dich bei der Genesung nach einer Ringbandverletzung."
+    "beschreibung": "Begleitet dich bei der Genesung nach einer Ringbandverletzung.",
+    "verletzungAendern": "Verletzung ändern"
   },
   "Konto": {
     "angemeldetAls": "Angemeldet als {email}",
@@ -64,6 +65,10 @@
     "bestaetigung": "Ich habe verstanden, dass PulleyPal keine ärztliche Behandlung ersetzt.",
     "speichern": "Behandlungsplan erstellen",
     "speichert": "Wird gespeichert …",
+    "aendernTitel": "Verletzung ändern",
+    "aendernEinleitung": "Passe deine Angaben an. PulleyPal überschreibt die bisherigen Angaben und berechnet deinen Behandlungsplan neu.",
+    "aenderungSpeichern": "Änderungen speichern",
+    "abbrechen": "Abbrechen und zurück zur Startseite",
     "fehler": {
       "gradeMissing": "Bitte wähle den Grad deiner Verletzung.",
       "gradeInvalid": "Bitte wähle einen der angebotenen Grade.",

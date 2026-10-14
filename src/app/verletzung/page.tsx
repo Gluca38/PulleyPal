@@ -23,10 +23,10 @@ export default function RecordInjuryPage() {
   );
 }
 
-// Ändern kommt mit einem eigenen Ticket; bis dahin geht es mit erfasster Verletzung zur Startseite
+// Mit erfasster Verletzung geht es zur Startseite; dort lässt sie sich ändern
 async function FormUnlessRecorded() {
   if (await getInjury()) {
     redirect("/");
   }
-  return <InjuryForm />;
+  return <InjuryForm mode="create" />;
 }

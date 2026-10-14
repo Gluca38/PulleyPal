@@ -273,3 +273,104 @@ test("Eingabeprüfung beim Erfassen", async ({ page }) => {
   await expect(alerts.filter({ hasText: "darf nicht in der Zukunft liegen" })).toBeVisible();
   await expect(page).toHaveURL("/verletzung");
 });
+
+test("Starttag ändern: Heute-Karte zeigt die neue Woche", async ({ page }) => {
+  await login(page);
+  // Verletzung vor 20 Tagen: Woche 3
+  await recordGradeTwo(page, daysAgo(20));
+  const todayCard = page.getByRole("region", { name: "Heute" });
+  await expect(todayCard.getByText(/^Woche 3 von 1[34]$/)).toBeVisible();
+
+  await page.getByRole("link", { name: "Verletzung ändern" }).click();
+  await expect(page).toHaveURL("/verletzung/aendern");
+  await expect(page.getByRole("heading", { level: 1 })).toHaveText("Verletzung ändern");
+  // Vorausgefüllt mit den gespeicherten Werten
+  await expect(page.getByRole("radio", { name: /Grad II\b/ })).toBeChecked();
+  await expect(page.getByLabel("Tag der Verletzung")).toHaveValue(daysAgo(20));
+  await expect(page.getByLabel(/Verordnete Dauer/)).toHaveValue("");
+  // Die Bestätigung wird nicht erneut verlangt. getByRole übersieht die von
+  // Next.js versteckt vorgehaltene Seite „Verletzung erfassen“.
+  await expect(
+    page.getByRole("checkbox", { name: /keine ärztliche Behandlung ersetzt/ }),
+  ).toHaveCount(0);
+
+  // Vor 34 Tagen verletzt = Tag 35 = Woche 5
+  await page.getByLabel("Tag der Verletzung").fill(daysAgo(34));
+  await page.getByRole("button", { name: "Änderungen speichern" }).click();
+  await expect(page).toHaveURL("/");
+
+  await expect(todayCard.getByText(/^Woche 5 von 1[34]$/)).toBeVisible();
+  await expect(
+    todayCard.getByRole("heading", { name: "Woche 5–6 mit Ringbandschutzring" }),
+  ).toBeVisible();
+});
+
+test("Grad ändern: Felder je Grad, Plan wird neu berechnet", async ({ page }) => {
+  await login(page);
+  await recordGradeTwo(page, daysAgo(14), "8 Wochen");
+
+  await page.getByRole("link", { name: "Verletzung ändern" }).click();
+  const duration = page.getByLabel(/Verordnete Dauer/);
+  await expect(duration).toHaveValue("8");
+
+  // Bei einem anderen Grad gelten andere Dauern: wieder „Keine Angabe“
+  await page.getByRole("radio", { name: /Grad III/ }).check();
+  await expect(page.getByLabel(/Verordnete Dauer des Ringbandschutzrings/)).toHaveValue("");
+
+  // Die Schutzart gibt es nur bei Grad I
+  const protection = page.getByRole("group", { name: "Verordneter Ringbandschutz" });
+  await expect(protection).toHaveCount(0);
+  await page.getByRole("radio", { name: /Grad I\b/ }).check();
+  await expect(protection.getByRole("radio", { name: /Ring/ })).toBeChecked();
+  await protection.getByRole("radio", { name: /H-Tape/ }).check();
+  await page.getByLabel(/Verordnete Dauer des Ringbandschutzes/).selectOption({ label: "4 Wochen" });
+  await page.getByRole("button", { name: "Änderungen speichern" }).click();
+  await expect(page).toHaveURL("/");
+
+  // Vor 14 Tagen verletzt = Woche 3, jetzt mit den Texten für Grad I mit H-Tape
+  const todayCard = page.getByRole("region", { name: "Heute" });
+  await expect(todayCard.getByRole("heading", { name: "Woche 3–4 mit H-Tape" })).toBeVisible();
+
+  // Beim nächsten Ändern sind die neuen Werte vorausgefüllt
+  await page.getByRole("link", { name: "Verletzung ändern" }).click();
+  await expect(page.getByRole("radio", { name: /Grad I\b/ })).toBeChecked();
+  await expect(protection.getByRole("radio", { name: /H-Tape/ })).toBeChecked();
+  await expect(page.getByLabel(/Verordnete Dauer/)).toHaveValue("4");
+
+  // Abbrechen ändert nichts
+  await page.getByRole("link", { name: /Abbrechen/ }).click();
+  await expect(page).toHaveURL("/");
+  await expect(todayCard.getByRole("heading", { name: "Woche 3–4 mit H-Tape" })).toBeVisible();
+});
+
+test("Eingabeprüfung beim Ändern", async ({ page }) => {
+  await login(page);
+  await recordGradeTwo(page, daysAgo(20));
+  await page.goto("/verletzung/aendern");
+  const submit = page.getByRole("button", { name: "Änderungen speichern" });
+  const alerts = page.getByRole("alert");
+
+  await page.getByLabel("Tag der Verletzung").fill("");
+  await submit.click();
+  await expect(alerts.filter({ hasText: "Bitte gib den Tag der Verletzung ein" })).toBeVisible();
+  await expect(alerts.filter({ hasText: "Bitte bestätige" })).toHaveCount(0);
+  // Der Grad bleibt nach dem Fehler ausgewählt
+  await expect(page.getByRole("radio", { name: /Grad II\b/ })).toBeChecked();
+
+  await page.getByLabel("Tag der Verletzung").fill(daysAgo(-1));
+  await submit.click();
+  await expect(alerts.filter({ hasText: "darf nicht in der Zukunft liegen" })).toBeVisible();
+  await expect(page).toHaveURL("/verletzung/aendern");
+
+  // Nichts gespeichert: weiterhin Woche 3
+  await page.goto("/");
+  await expect(
+    page.getByRole("region", { name: "Heute" }).getByText(/^Woche 3 von 1[34]$/),
+  ).toBeVisible();
+});
+
+test("Ohne erfasste Verletzung führt Ändern zum Erfassen", async ({ page }) => {
+  await login(page);
+  await page.goto("/verletzung/aendern");
+  await expect(page).toHaveURL("/verletzung");
+});
