@@ -1,5 +1,6 @@
 "use server";
 
+import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 import { createInjury, updateInjury } from "@/lib/injury";
 import { validateInjuryForm, type InjuryFormState } from "./validate-injury-form";
@@ -42,5 +43,8 @@ export async function changeInjury(
     redirect("/verletzung");
   }
 
+  // Der Browser hält die Seite „Verletzung ändern“ zwischengespeichert vor.
+  // Ohne das zeigt sie beim nächsten Aufruf noch die alten Werte.
+  revalidatePath("/verletzung/aendern");
   redirect("/");
 }

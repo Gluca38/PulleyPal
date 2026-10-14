@@ -36,7 +36,10 @@ async function FormWithSavedInjury() {
   if (!injury) {
     redirect("/verletzung");
   }
-  return <InjuryForm mode="change" savedValues={formValuesOf(injury)} />;
+  const savedValues = formValuesOf(injury);
+  // Next.js hält besuchte Seiten versteckt vor und behält dabei den Formularinhalt.
+  // Nach dem Speichern zeigt das Formular so beim nächsten Aufruf die neuen Werte.
+  return <InjuryForm key={JSON.stringify(savedValues)} mode="change" savedValues={savedValues} />;
 }
 
 function formValuesOf(injury: Injury): InjuryFormValues {

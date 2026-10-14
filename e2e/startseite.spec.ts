@@ -288,8 +288,11 @@ test("Starttag ändern: Heute-Karte zeigt die neue Woche", async ({ page }) => {
   await expect(page.getByRole("radio", { name: /Grad II\b/ })).toBeChecked();
   await expect(page.getByLabel("Tag der Verletzung")).toHaveValue(daysAgo(20));
   await expect(page.getByLabel(/Verordnete Dauer/)).toHaveValue("");
-  // Die Bestätigung wird nicht erneut verlangt
-  await expect(page.getByLabel(/keine ärztliche Behandlung ersetzt/)).toHaveCount(0);
+  // Die Bestätigung wird nicht erneut verlangt. getByRole übersieht die von
+  // Next.js versteckt vorgehaltene Seite „Verletzung erfassen“.
+  await expect(
+    page.getByRole("checkbox", { name: /keine ärztliche Behandlung ersetzt/ }),
+  ).toHaveCount(0);
 
   // Vor 34 Tagen verletzt = Tag 35 = Woche 5
   await page.getByLabel("Tag der Verletzung").fill(daysAgo(34));
