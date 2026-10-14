@@ -67,6 +67,11 @@
   },
   "Behandlungsplan": {
     "heute": "Heute",
+    "zeitleiste": "Zeitleiste",
+    "aktuell": "Aktuell",
+    "zeitraum": "{start} – {ende}",
+    "ab": "ab {datum}",
+    "meilensteinLabel": "Meilenstein",
     "woche": "Woche {woche} von {gesamt}",
     "phase": {
       "week1to2": {

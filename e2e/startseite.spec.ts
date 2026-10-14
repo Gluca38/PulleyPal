@@ -39,11 +39,15 @@ test("Neue Person erfasst Grad II und sieht die Heute-Karte", async ({ page }) =
 
   await expect(page).toHaveTitle("PulleyPal");
   await expect(page.getByRole("heading", { level: 1 })).toHaveText("PulleyPal");
-  await expect(page.getByText(/^Woche 3 von 1[34]$/)).toBeVisible();
-  await expect(page.getByRole("heading", { name: "Woche 3–4 mit Ringbandschutzring" })).toBeVisible();
-  await expect(page.getByText("Kein Klettern mit dem Ringbandschutzring")).toBeVisible();
-  await expect(page.getByText(/Leichte sportartspezifische Aktivität/)).toBeVisible();
-  await expect(page.getByText(/noch 22 Tage/)).toBeVisible();
+  // Die Zeitleiste wiederholt Phasen und Meilensteine, daher nur in der Heute-Karte suchen
+  const todayCard = page.getByRole("region", { name: "Heute" });
+  await expect(todayCard.getByText(/^Woche 3 von 1[34]$/)).toBeVisible();
+  await expect(
+    todayCard.getByRole("heading", { name: "Woche 3–4 mit Ringbandschutzring" }),
+  ).toBeVisible();
+  await expect(todayCard.getByText("Kein Klettern mit dem Ringbandschutzring")).toBeVisible();
+  await expect(todayCard.getByText(/Leichte sportartspezifische Aktivität/)).toBeVisible();
+  await expect(todayCard.getByText(/noch 22 Tage/)).toBeVisible();
 
   // Die Verletzung ist erfasst, das Formular wird nicht mehr gebraucht
   await page.goto("/verletzung");
@@ -56,9 +60,73 @@ test("Nachträglich erfasst mit 8 Wochen: direkt in der Schutzphase", async ({ p
   // Vor 60 Tagen verletzt, volle Aktivität nach 8 Wochen (Tag 57) = Woche 9
   await recordGradeTwo(page, daysAgo(60), "8 Wochen");
 
-  await expect(page.getByText(/^Woche 9 von 1[34]$/)).toBeVisible();
-  await expect(page.getByRole("heading", { name: "Schutzphase mit H-Tape" })).toBeVisible();
-  await expect(page.getByText(/Ende des H-Tape-Schutzes/)).toBeVisible();
+  const todayCard = page.getByRole("region", { name: "Heute" });
+  await expect(todayCard.getByText(/^Woche 9 von 1[34]$/)).toBeVisible();
+  await expect(todayCard.getByRole("heading", { name: "Schutzphase mit H-Tape" })).toBeVisible();
+  await expect(todayCard.getByText(/Ende des H-Tape-Schutzes/)).toBeVisible();
+});
+
+// Datum so, wie die App es auf Deutsch anzeigt, z. B. „12. Februar 2026“
+function formatted(isoDate: string) {
+  return new Intl.DateTimeFormat("de-DE", { dateStyle: "long", timeZone: "UTC" }).format(
+    new Date(`${isoDate}T00:00:00Z`),
+  );
+}
+
+test("Zeitleiste zeigt alle Phasen und Meilensteine, die aktuelle hervorgehoben", async ({ page }) => {
+  await login(page);
+  // Verletzung vor 20 Tagen: aktuell Woche 3–4
+  await recordGradeTwo(page, daysAgo(20));
+
+  const timeline = page.getByRole("region", { name: "Zeitleiste" });
+  await expect(timeline.locator("summary")).toHaveText([
+    /Woche 1–2/,
+    /Woche 3–4/,
+    /Woche 5–6/,
+    /Aufbautraining/,
+    /Schutzphase mit H-Tape/,
+  ]);
+
+  // Aktuelle Phase: hervorgehoben und aufgeklappt
+  const current = timeline.locator('[aria-current="step"]');
+  await expect(current).toHaveCount(1);
+  await expect(current).toContainText("Woche 3–4");
+  await expect(current.getByText(/Isometrie, Krankengymnastik/)).toBeVisible();
+
+  // Andere Phasen sind zu und lassen sich per Klick aufklappen
+  const firstPhaseContent = timeline.getByText(/Geführte Bewegungen/);
+  await expect(firstPhaseContent).toBeHidden();
+  await timeline.locator("summary", { hasText: "Woche 1–2" }).click();
+  await expect(firstPhaseContent).toBeVisible();
+
+  // … und per Tastatur
+  const rebuildContent = timeline.getByText(/Vorsichtige Hängeübungen am Griffboard/);
+  await expect(rebuildContent).toBeHidden();
+  await timeline.locator("summary", { hasText: "Aufbautraining" }).focus();
+  await page.keyboard.press("Enter");
+  await expect(rebuildContent).toBeVisible();
+
+  // Meilensteine mit Datum (leichte Aktivität nach 6 Wochen = in 22 Tagen)
+  const milestones = timeline.getByRole("listitem").filter({ hasText: "Meilenstein" });
+  await expect(milestones).toHaveText([
+    new RegExp(`Leichte sportartspezifische Aktivität.*${formatted(daysAgo(-22))}`),
+    new RegExp(`Volle sportartspezifische Aktivität.*${formatted(daysAgo(-50))}`),
+    /Ende des H-Tape-Schutzes/,
+  ]);
+  await expect(timeline.getByText("Abgeschlossen")).toBeVisible();
+});
+
+test("Zeitleiste kennzeichnet einen abgeschlossenen Plan", async ({ page }) => {
+  await login(page);
+  // Vor 120 Tagen verletzt: mehr als 3 Monate, Plan abgeschlossen
+  await recordGradeTwo(page, daysAgo(120));
+
+  const timeline = page.getByRole("region", { name: "Zeitleiste" });
+  const current = timeline.locator('[aria-current="step"]');
+  await expect(current).toHaveCount(1);
+  await expect(current).toContainText("Abgeschlossen");
+  // Keine Phase ist mehr aufgeklappt
+  await expect(timeline.locator("details[open]")).toHaveCount(0);
 });
 
 test("Eingabeprüfung beim Erfassen", async ({ page }) => {

@@ -1,28 +1,15 @@
 "use client";
 
-import { useLocale, useTranslations } from "next-intl";
-import type { Injury } from "@/lib/injury";
-import { calculateTreatmentPlan, type IsoDate, type Rule } from "@/lib/treatment-plan/treatment-plan";
-import { useToday } from "@/lib/use-today";
+import { useTranslations } from "next-intl";
+import type { Rule, TodayStatus } from "@/lib/treatment-plan/treatment-plan";
+import { useFormatDate } from "./format-date";
 
 const RULE_TYPES: Rule["type"][] = ["forbidden", "allowed", "reminder"];
 
-// Heute-Karte: wo die Person heute in ihrem Behandlungsplan steht.
-// Läuft im Browser, weil „heute“ das Datum des Geräts ist (siehe useToday).
-export function TodayCard({ injury }: { injury: Injury }) {
+// Heute-Karte: wo die Person heute in ihrem Behandlungsplan steht
+export function TodayCard({ status }: { status: TodayStatus }) {
   const t = useTranslations("Behandlungsplan");
-  const locale = useLocale();
-  const today = useToday();
-
-  if (!today) {
-    return null;
-  }
-
-  const { status } = calculateTreatmentPlan({ ...injury, today });
-  const formatDate = (date: IsoDate) =>
-    new Intl.DateTimeFormat(locale, { dateStyle: "long", timeZone: "UTC" }).format(
-      new Date(`${date}T00:00:00Z`),
-    );
+  const formatDate = useFormatDate();
 
   if (status.kind === "completed") {
     return (
@@ -47,7 +34,7 @@ export function TodayCard({ injury }: { injury: Injury }) {
       <div className="stack-small">
         <h3>{t(`phase.${phase.content}.name`)}</h3>
         <p className="hint">
-          {formatDate(phase.startDate)} – {formatDate(phase.endDate)}
+          {t("zeitraum", { start: formatDate(phase.startDate), ende: formatDate(phase.endDate) })}
         </p>
         <p>{t(`phase.${phase.content}.inhalt`)}</p>
       </div>
