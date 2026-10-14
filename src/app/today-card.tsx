@@ -16,6 +16,7 @@ export function TodayCard({ status }: { status: TodayStatus }) {
       <section className="card" aria-labelledby="today-heading">
         <h2 id="today-heading">{t("abgeschlossen")}</h2>
         <p>{t("abgeschlossenText")}</p>
+        {status.permanentTaping && <p>{t("dauerhaftTapen")}</p>}
       </section>
     );
   }

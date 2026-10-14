@@ -29,10 +29,11 @@ test("Neue Person erfasst Grad II und sieht die Heute-Karte", async ({ page }) =
 
   await expect(page.getByRole("heading", { level: 1 })).toHaveText("Verletzung erfassen");
   await expect(page.getByText(/PulleyPal stellt keine Diagnose/)).toBeVisible();
-  // Nur Grad II ist schon auswählbar
+  // Grad II, III und IV a sind schon auswählbar
   await expect(page.getByRole("radio", { name: /Grad I\b/ })).toBeDisabled();
-  await expect(page.getByRole("radio", { name: /Grad III/ })).toBeDisabled();
-  await expect(page.getByText("folgt bald")).toHaveCount(4);
+  await expect(page.getByRole("radio", { name: /Grad III/ })).toBeEnabled();
+  await expect(page.getByRole("radio", { name: /Grad IV a/ })).toBeEnabled();
+  await expect(page.getByText("folgt bald")).toHaveCount(2);
 
   // Verletzung vor 20 Tagen = Tag 21 = Woche 3
   await recordGradeTwo(page, daysAgo(20));
@@ -64,6 +65,46 @@ test("Nachträglich erfasst mit 8 Wochen: direkt in der Schutzphase", async ({ p
   await expect(todayCard.getByText(/^Woche 9 von 1[34]$/)).toBeVisible();
   await expect(todayCard.getByRole("heading", { name: "Schutzphase mit H-Tape" })).toBeVisible();
   await expect(todayCard.getByText(/Ende des H-Tape-Schutzes/)).toBeVisible();
+});
+
+test("Grad IV a vor 9 Wochen: Aufbautraining, noch kein Klettern", async ({ page }) => {
+  await login(page);
+
+  await page.getByRole("radio", { name: /Grad IV a/ }).check();
+  // Bei Grad IV a ist der Ring fest 8 Wochen, keine Dauer abzufragen
+  await expect(page.getByLabel(/Verordnete Dauer/)).toHaveCount(0);
+  // Grad III fragt nach der Ringdauer
+  await page.getByRole("radio", { name: /Grad III/ }).check();
+  await expect(page.getByLabel(/Verordnete Dauer des Ringbandschutzrings/)).toBeVisible();
+  await page.getByRole("radio", { name: /Grad IV a/ }).check();
+
+  // Vor 60 Tagen verletzt = Tag 61 = Woche 9: Ring vorbei, Klettern erst ab Woche 11
+  await page.getByLabel("Tag der Verletzung").fill(daysAgo(60));
+  await page.getByLabel(/keine ärztliche Behandlung ersetzt/).check();
+  await page.getByRole("button", { name: "Behandlungsplan erstellen" }).click();
+  await expect(page).toHaveURL("/");
+
+  const todayCard = page.getByRole("region", { name: "Heute" });
+  await expect(todayCard.getByText(/^Woche 9 von 53$/)).toBeVisible();
+  await expect(
+    todayCard.getByRole("heading", { name: "Aufbautraining – noch kein Klettern" }),
+  ).toBeVisible();
+  await expect(todayCard.getByText(/^Noch kein Klettern/)).toBeVisible();
+  await expect(todayCard.getByText(/Vorsichtiges Klettern mit H-Tape, Belastung/)).toHaveCount(0);
+  // Leichte Aktivität nach 10 Wochen (Tag 71) = in 10 Tagen
+  await expect(todayCard.getByText(/Leichte sportartspezifische Aktivität/)).toBeVisible();
+  await expect(todayCard.getByText(/noch 10 Tage/)).toBeVisible();
+
+  const timeline = page.getByRole("region", { name: "Zeitleiste" });
+  await expect(timeline.locator("summary")).toHaveText([
+    /Woche 1–2/,
+    /Woche 3–4/,
+    /Woche 5–6/,
+    /Woche 7–8/,
+    /Aufbautraining – noch kein Klettern/,
+    /^Aufbautraining(?! –)/,
+    /Ab 4 Monaten: Vollbelastung/,
+  ]);
 });
 
 // Datum so, wie die App es auf Deutsch anzeigt, z. B. „12. Februar 2026“

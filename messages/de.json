@@ -48,7 +48,10 @@
     "folgtBald": "folgt bald",
     "starttagLabel": "Tag der Verletzung",
     "starttagHinweis": "Ab diesem Tag zählen die Wochen deines Behandlungsplans. Du kannst ihn auch nachträglich eingeben.",
-    "dauerLabel": "Verordnete Dauer bis zur vollen sportartspezifischen Aktivität (optional)",
+    "dauerLabel": {
+      "II": "Verordnete Dauer bis zur vollen sportartspezifischen Aktivität (optional)",
+      "III": "Verordnete Dauer des Ringbandschutzrings (optional)"
+    },
     "dauerHinweis": "Wenn deine Ärztin oder dein Arzt nichts dazu gesagt hat, lass „Keine Angabe“ stehen. Dann gilt der längere, vorsichtigere Wert.",
     "dauerKeineAngabe": "Keine Angabe ({wochen} Wochen)",
     "dauerWochen": "{wochen} Wochen",
@@ -86,6 +89,14 @@
         "name": "Woche 5–6 mit Ringbandschutzring",
         "inhalt": "Vorsichtige konzentrische Kräftigung der Finger unter Ringbandschutz, z. B. mit Gogor (Muskers Climbing), unter schrittweiser Steigerung des Widerstands: mit den schwächsten Federn beginnen, dann langsam steigern. Zusätzlich leichte statische Halteübungen an der Griffleiste, aber noch kein Hängen am Griffboard. Direkten Druck auf das verletzte Ringband vermeiden (Klimmzugstange!)."
       },
+      "week7to8": {
+        "name": "Woche 7–8 mit Ringbandschutzring",
+        "inhalt": "Weitere Steigerung der Belastung der beiden Wochen zuvor unter Ringbandschutz."
+      },
+      "rebuildBeforeClimbing": {
+        "name": "Aufbautraining – noch kein Klettern",
+        "inhalt": "Vorsichtige Hängeübungen am Griffboard mit Slopergriffen und Entlastung durch ein Elastikband, Klimmzüge an der Stange mit H-Tape. Noch kein Klettern: Vorsichtiges Klettern mit H-Tape beginnt erst mit der leichten sportartspezifischen Aktivität."
+      },
       "rebuild": {
         "name": "Aufbautraining",
         "inhalt": "Vorsichtige Hängeübungen am Griffboard mit Slopergriffen und Entlastung durch ein Elastikband, Klimmzüge an der Stange mit H-Tape. Beginn vorsichtiges Klettern, Belastungssteigerung bis zur absoluten Vollbelastung über 4–6 Wochen. Ringbandschutz: H-Tape."
@@ -93,6 +104,10 @@
       "taping": {
         "name": "Schutzphase mit H-Tape",
         "inhalt": "Volle sportartspezifische Aktivität. Das verheilte Ringband beim Klettern weiterhin mit H-Tape schützen."
+      },
+      "tapingFullLoad": {
+        "name": "Ab 4 Monaten: Vollbelastung mit H-Tape",
+        "inhalt": "Vollbelastung, Wettkampffähigkeit. Weiterhin Taping für mindestens ein Jahr, besser auf Dauer."
       }
     },
     "regelArt": {
@@ -117,6 +132,7 @@
     },
     "meilensteinAm": "am {datum}, {tage, plural, one {noch # Tag} other {noch # Tage}}",
     "abgeschlossen": "Abgeschlossen",
-    "abgeschlossenText": "Dein Behandlungsplan ist abgeschlossen."
+    "abgeschlossenText": "Dein Behandlungsplan ist abgeschlossen.",
+    "dauerhaftTapen": "Tape den Finger beim Klettern weiterhin mit H-Tape, am besten auf Dauer."
   }
 }
