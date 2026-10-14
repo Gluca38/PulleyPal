@@ -37,11 +37,14 @@ _Avoid_: Periode, Stufe, Abschnitt
 Eine Phase, in der der Ringbandschutz (Ring oder bei Grad I ggf. H-Tape) getragen wird und der Wochenplan gilt. Klettern ist verboten.
 
 **Aufbautraining** (`rebuildPhase`):
-Die Phase vom Ende der Ringzeit bis zur vollen sportartspezifischen Aktivität. Klettern erst ab dem Meilenstein „leichte sportartspezifische Aktivität“.
+Die Phase vom Ende der Ringzeit bis zur vollen sportartspezifischen Aktivität. Klettern erst ab dem Meilenstein „leichte sportartspezifische Aktivität“. Liegt dieser nach dem Ende der Ringzeit (z. B. Grad IV a, Woche 9–10), ist das Aufbautraining in zwei Phasen geteilt: erst **noch kein Klettern** (`rebuildBeforeClimbing`), dann mit vorsichtigem Klettern.
 
 **Schutzphase** (`tapingPhase`):
-Die Phase von der vollen sportartspezifischen Aktivität bis zum Ende des H-Tape-Schutzes.
+Die Phase von der vollen sportartspezifischen Aktivität bis zum Ende des H-Tape-Schutzes. Bei Grad IV a mit dem Inhalt „Ab 4 Monaten“ aus dem Behandlungsschema (`tapingFullLoad`).
 _Avoid_: Tape-Phase
+
+**Dauer-Tape-Empfehlung** (`permanentTaping`):
+Bei Grad IV a und IV b der Hinweis im Zustand „Abgeschlossen“, beim Klettern dauerhaft mit H-Tape zu tapen.
 
 **Abgeschlossen** (`completed`):
 Der Zustand nach dem Ende der Schutzphase; der Behandlungsplan hat keine weiteren Phasen.

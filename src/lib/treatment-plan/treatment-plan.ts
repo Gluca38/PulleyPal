@@ -14,7 +14,17 @@ export type TreatmentPlanInput = {
 };
 
 // Inhalt einer Phase; der Text dazu steht in der Sprachdatei
-export type PhaseContent = "week1to2" | "week3to4" | "week5to6" | "rebuild" | "taping";
+export type PhaseContent =
+  | "week1to2"
+  | "week3to4"
+  | "week5to6"
+  | "week7to8"
+  // Aufbautraining vor der leichten sportartspezifischen Aktivität: noch kein Klettern
+  | "rebuildBeforeClimbing"
+  | "rebuild"
+  | "taping"
+  // Schutzphase „Ab 4 Monaten“ (Grad IV a): Vollbelastung, Wettkampffähigkeit
+  | "tapingFullLoad";
 
 export type Phase = {
   kind: "splint" | "rebuild" | "taping";
@@ -54,7 +64,8 @@ export type TodayStatus =
       nextMilestone: (Milestone & { daysUntil: number }) | null;
       rules: Rule[];
     }
-  | { kind: "completed" };
+  // permanentTaping: Empfehlung, beim Klettern dauerhaft zu tapen (Abschnitt 3)
+  | { kind: "completed"; permanentTaping: boolean };
 
 export type TreatmentPlan = {
   phases: Phase[];
@@ -65,14 +76,19 @@ export type TreatmentPlan = {
 // Zeitangabe „nach N Wochen“ bzw. „nach N Monaten“ ab dem Starttag
 type After = { weeks: number } | { months: number };
 
+type PrescribedDuration = { options: number[]; default: number };
+
 type GradeRules = {
-  prescribedDuration: { options: number[]; default: number };
+  // null: Der Grad hat keine Spanne, nach der Dauer wird nicht gefragt
+  prescribedDuration: PrescribedDuration | null;
   // Je nach verordneter Dauer: Inhalte der Ring-Phasen und Zeitpunkte laut Tabelle
-  plan: (prescribedWeeks: number) => {
+  plan: (prescribedWeeks: number | null) => {
     splintPhases: PhaseContent[];
     lightClimbing: After;
     fullClimbing: After;
     tapingEnd: After;
+    tapingContent: "taping" | "tapingFullLoad";
+    permanentTaping: boolean;
   };
 };
 
@@ -85,8 +101,41 @@ const GRADE_RULES: Partial<Record<Grade, GradeRules>> = {
       // Abschnitt 1: 6 Wochen Ring; Abschnitt 3: Woche 7–8 nur bei Grad III
       splintPhases: ["week1to2", "week3to4", "week5to6"],
       lightClimbing: { weeks: 6 },
-      fullClimbing: { weeks: prescribedWeeks },
+      fullClimbing: { weeks: prescribedWeeks ?? 10 },
       tapingEnd: { months: 3 },
+      tapingContent: "taping",
+      permanentTaping: false,
+    }),
+  },
+  III: {
+    // Abschnitt 1: 6–8 Wochen thermoplastischer Ring
+    prescribedDuration: { options: [6, 8], default: 8 },
+    plan: (prescribedWeeks) => ({
+      // Abschnitt 3: Woche 7–8 nur, wenn ein Ring für 8 Wochen verordnet ist
+      splintPhases:
+        prescribedWeeks === 6
+          ? ["week1to2", "week3to4", "week5to6"]
+          : ["week1to2", "week3to4", "week5to6", "week7to8"],
+      lightClimbing: { weeks: 8 },
+      // Abschnitt 3: Für Grad III gilt die Tabelle, nicht „Ab 4 Monaten“
+      fullClimbing: { months: 3 },
+      tapingEnd: { months: 6 },
+      tapingContent: "taping",
+      permanentTaping: false,
+    }),
+  },
+  IVa: {
+    prescribedDuration: null,
+    plan: () => ({
+      // Abschnitt 1: 8 Wochen Ring; Abschnitt 3: Wochenplan inklusive Woche 7–8
+      splintPhases: ["week1to2", "week3to4", "week5to6", "week7to8"],
+      lightClimbing: { weeks: 10 },
+      // Abschnitt 2, „Ab 4 Monaten“: Vollbelastung, Wettkampffähigkeit
+      fullClimbing: { months: 4 },
+      // Abschnitt 1: H-Tape-Schutz > 12 Monate; Abschnitt 3: danach dauerhaft tapen
+      tapingEnd: { months: 12 },
+      tapingContent: "tapingFullLoad",
+      permanentTaping: true,
     }),
   },
 };
@@ -94,8 +143,9 @@ const GRADE_RULES: Partial<Record<Grade, GradeRules>> = {
 // Grade, für die die App schon einen Behandlungsplan berechnen kann
 export const SUPPORTED_GRADES = Object.keys(GRADE_RULES) as Grade[];
 
-// Auswahl und Standardwert der verordneten Dauer in Wochen (null: nicht unterstützter Grad)
-export function prescribedDurationFor(grade: Grade) {
+// Auswahl und Standardwert der verordneten Dauer in Wochen
+// (null: Grad ohne Spanne oder noch nicht unterstützt)
+export function prescribedDurationFor(grade: Grade): PrescribedDuration | null {
   return GRADE_RULES[grade]?.prescribedDuration ?? null;
 }
 
@@ -107,7 +157,7 @@ function weekOf(startDate: IsoDate, date: IsoDate) {
   return Math.floor(daysBetween(startDate, date) / 7) + 1;
 }
 
-function rulesFor(phase: Phase, today: IsoDate, lightClimbing: IsoDate, tapingEnd: IsoDate): Rule[] {
+function rulesFor(phase: Phase, tapingEnd: IsoDate): Rule[] {
   const unspecificTraining: Rule = { key: "unspecificTraining", type: "allowed" };
 
   switch (phase.kind) {
@@ -122,9 +172,9 @@ function rulesFor(phase: Phase, today: IsoDate, lightClimbing: IsoDate, tapingEn
       // Abschnitt 2, Aufbautraining; Abschnitt 3: Klettern erst ab leichter sportartspezifischer Aktivität
       return [
         { key: "noHangingWithSplint", type: "forbidden" },
-        today >= lightClimbing
-          ? { key: "carefulClimbingWithTape", type: "allowed" }
-          : { key: "noClimbingYet", type: "forbidden" },
+        phase.content === "rebuildBeforeClimbing"
+          ? { key: "noClimbingYet", type: "forbidden" }
+          : { key: "carefulClimbingWithTape", type: "allowed" },
         unspecificTraining,
       ];
     case "taping":
@@ -148,7 +198,9 @@ export function calculateTreatmentPlan(input: TreatmentPlanInput): TreatmentPlan
     throw new Error(`Grad ${grade} wird noch nicht unterstützt.`);
   }
 
-  const plan = rules.plan(input.prescribedDurationWeeks ?? rules.prescribedDuration.default);
+  const plan = rules.plan(
+    input.prescribedDurationWeeks ?? rules.prescribedDuration?.default ?? null,
+  );
   const fullClimbing = dateAfter(startDate, plan.fullClimbing);
   const tapingEnd = dateAfter(startDate, plan.tapingEnd);
   // Abschnitt 3: Die Meilensteine gelten fest laut Tabelle
@@ -167,16 +219,47 @@ export function calculateTreatmentPlan(input: TreatmentPlanInput): TreatmentPlan
   }));
   const splintEnd = addDays(startDate, plan.splintPhases.length * SPLINT_PHASE_DAYS);
 
+  // Abschnitt 3: Liegt die leichte sportartspezifische Aktivität nach dem Ende
+  // der Ringzeit, gibt es bis dahin Aufbautraining noch ohne Klettern
+  const hasGap = lightClimbing > splintEnd;
+  const climbingStart = hasGap ? lightClimbing : splintEnd;
+  const rebuildBeforeClimbing: Phase[] =
+    hasGap
+      ? [
+          {
+            kind: "rebuild",
+            content: "rebuildBeforeClimbing",
+            startDate: splintEnd,
+            endDate: addDays(climbingStart, -1),
+          },
+        ]
+      : [];
+
   // Abschnitt 3, Ablauf nach der Ringzeit
   const phases: Phase[] = [
     ...splintPhases,
-    { kind: "rebuild", content: "rebuild", startDate: splintEnd, endDate: addDays(fullClimbing, -1) },
-    { kind: "taping", content: "taping", startDate: fullClimbing, endDate: addDays(tapingEnd, -1) },
+    ...rebuildBeforeClimbing,
+    {
+      kind: "rebuild",
+      content: "rebuild",
+      startDate: climbingStart,
+      endDate: addDays(fullClimbing, -1),
+    },
+    {
+      kind: "taping",
+      content: plan.tapingContent,
+      startDate: fullClimbing,
+      endDate: addDays(tapingEnd, -1),
+    },
   ];
 
   const phase = phases.find((p) => today >= p.startDate && today <= p.endDate);
   if (!phase) {
-    return { phases, milestones, status: { kind: "completed" } };
+    return {
+      phases,
+      milestones,
+      status: { kind: "completed", permanentTaping: plan.permanentTaping },
+    };
   }
 
   const nextMilestone = milestones.find((milestone) => milestone.date > today);
@@ -192,7 +275,7 @@ export function calculateTreatmentPlan(input: TreatmentPlanInput): TreatmentPlan
       nextMilestone: nextMilestone
         ? { ...nextMilestone, daysUntil: daysBetween(today, nextMilestone.date) }
         : null,
-      rules: rulesFor(phase, today, lightClimbing, tapingEnd),
+      rules: rulesFor(phase, tapingEnd),
     },
   };
 }

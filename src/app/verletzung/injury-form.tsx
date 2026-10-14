@@ -82,7 +82,7 @@ export function InjuryForm() {
 
       {duration && (
         <div className="stack-small">
-          <label htmlFor="prescribedDuration">{t("dauerLabel")}</label>
+          <label htmlFor="prescribedDuration">{t(`dauerLabel.${grade as Grade}`)}</label>
           <p className="hint" id="prescribedDuration-hint">
             {t("dauerHinweis")}
           </p>
