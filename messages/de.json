@@ -215,5 +215,24 @@
     "abgeschlossen": "Abgeschlossen",
     "abgeschlossenText": "Dein Behandlungsplan ist abgeschlossen.",
     "dauerhaftTapen": "Tape den Finger beim Klettern weiterhin mit H-Tape, am besten auf Dauer."
+  },
+  "Kontraktur": {
+    "frage": "Lässt sich dein Finger nicht mehr ganz strecken?",
+    "erklaerung": "Lässt sich dein Finger im Mittelgelenk um mehr als 20° nicht strecken, spricht man von einer Kontraktur. Dann kann eine Operation nötig sein. Du kannst sie hier melden; PulleyPal fragt nicht regelmäßig danach.",
+    "melden": "Kontraktur melden",
+    "gemeldetTitel": "Kontraktur gemeldet: mögliche OP ärztlich abklären",
+    "gemeldetText": "Du hast gemeldet, dass sich dein Finger im Mittelgelenk um mehr als 20° nicht strecken lässt. Bei Grad IV a kann dann eine Operation nötig sein. Lass bitte ärztlich abklären, ob du operiert werden solltest.",
+    "operiertTitel": "Ich wurde operiert → zu Grad IV b wechseln",
+    "operiertHinweis": "Nach der OP gilt Grad IV b. Dein Behandlungsplan zählt dann ab dem Tag der OP und zeigt nur noch die Eckpunkte nach der OP.",
+    "opTag": "Tag der OP",
+    "wechseln": "Zu Grad IV b wechseln",
+    "speichert": "Wird gespeichert …",
+    "zuruecknehmen": "Meldung zurücknehmen",
+    "fehler": {
+      "surgeryDateMissing": "Bitte gib den Tag der OP ein.",
+      "surgeryDateInFuture": "Der Tag der OP darf nicht in der Zukunft liegen.",
+      "surgeryDateBeforeStartDate": "Der Tag der OP darf nicht vor dem Tag der Verletzung ({datum}) liegen.",
+      "saveFailed": "Das konnte gerade nicht gespeichert werden. Bitte versuche es noch einmal."
+    }
   }
 }

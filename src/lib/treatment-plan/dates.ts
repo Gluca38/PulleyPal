@@ -36,3 +36,22 @@ export function addMonths(date: IsoDate, months: number): IsoDate {
 export function daysBetween(from: IsoDate, to: IsoDate): number {
   return Math.round((toUtc(to) - toUtc(from)) / MS_PER_DAY);
 }
+
+const ISO_DATE = /^\d{4}-\d{2}-\d{2}$/;
+
+// Gültiges Kalenderdatum im Format JJJJ-MM-TT
+export function isValidDate(value: string) {
+  // Abgleich hin und zurück erkennt Tage wie den 31. Februar
+  return ISO_DATE.test(value) && addDays(value, 0) === value;
+}
+
+// Spätester erlaubter Starttag (Tag der Verletzung oder der OP). Formulare
+// schicken das heutige Datum des Geräts mit, damit „nicht in der Zukunft“ in
+// der Zeitzone der Person gilt. Weicht es mehr als einen Tag vom Server ab,
+// gilt das Serverdatum (UTC).
+export function latestStartDate(deviceToday: string, serverToday: IsoDate): IsoDate {
+  if (ISO_DATE.test(deviceToday) && Math.abs(daysBetween(serverToday, deviceToday)) <= 1) {
+    return deviceToday;
+  }
+  return serverToday;
+}

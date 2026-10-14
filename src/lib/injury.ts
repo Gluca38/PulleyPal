@@ -12,6 +12,9 @@ export type Injury = {
   protectionType: ProtectionType | null;
 };
 
+// Die gespeicherte Verletzung samt Kontraktur-Meldung (nur Grad IV a)
+export type SavedInjury = Injury & { contractureReported: boolean };
+
 // Schutzart im Code und in der Datenbank (Spalte protection_type)
 const PROTECTION_TYPE_IN_DB: Record<ProtectionType, string> = { ring: "ring", hTape: "h_tape" };
 
@@ -31,12 +34,12 @@ function injuryToRow(injury: Injury) {
 }
 
 // Liefert die Verletzung der eingeloggten Person oder null, wenn noch keine erfasst ist
-export async function getInjury(): Promise<Injury | null> {
+export async function getInjury(): Promise<SavedInjury | null> {
   const user = await getCurrentUser();
   const supabase = await createClient();
   const { data, error } = await supabase
     .from("injuries")
-    .select("grade, start_date, prescribed_duration_weeks, protection_type")
+    .select("grade, start_date, prescribed_duration_weeks, protection_type, contracture_reported_at")
     .eq("user_id", user.id)
     .maybeSingle();
 
@@ -52,6 +55,7 @@ export async function getInjury(): Promise<Injury | null> {
     startDate: data.start_date,
     prescribedDurationWeeks: data.prescribed_duration_weeks,
     protectionType: protectionTypeFromDb(data.protection_type),
+    contractureReported: data.contracture_reported_at !== null,
   };
 }
 
@@ -82,21 +86,47 @@ export type UpdateInjuryResult = "updated" | "notFound" | "error";
 
 // Überschreibt die Verletzung der eingeloggten Person (kein Verlauf). Die
 // Bestätigung vom Erfassen bleibt bestehen. Eine gemeldete Kontraktur gibt es
-// nur bei Grad IV a und entfällt bei einem anderen Grad.
-export async function updateInjury(injury: Injury): Promise<UpdateInjuryResult> {
+// nur bei Grad IV a und entfällt bei einem anderen Grad. Mit onlyIfGrade wird
+// nur überschrieben, wenn noch dieser Grad gespeichert ist (sonst notFound).
+export async function updateInjury(
+  injury: Injury,
+  { onlyIfGrade }: { onlyIfGrade?: Grade } = {},
+): Promise<UpdateInjuryResult> {
   const user = await getCurrentUser();
   const supabase = await createClient();
-  const { data, error } = await supabase
+  let query = supabase
     .from("injuries")
     .update({
       ...injuryToRow(injury),
       ...(injury.grade === "IVa" ? {} : { contracture_reported_at: null }),
     })
-    .eq("user_id", user.id)
-    .select("user_id");
+    .eq("user_id", user.id);
+  if (onlyIfGrade) {
+    query = query.eq("grade", onlyIfGrade);
+  }
+  const { data, error } = await query.select("user_id");
 
   if (error) {
     console.error("Verletzung konnte nicht geändert werden:", error.message);
+    return "error";
+  }
+  return data.length > 0 ? "updated" : "notFound";
+}
+
+// Meldet eine Kontraktur oder nimmt die Meldung zurück. Nur bei Grad IV a;
+// bei einem anderen Grad (z. B. in einem anderen Tab geändert) passiert nichts.
+export async function setContractureReported(reported: boolean): Promise<UpdateInjuryResult> {
+  const user = await getCurrentUser();
+  const supabase = await createClient();
+  const { data, error } = await supabase
+    .from("injuries")
+    .update({ contracture_reported_at: reported ? new Date().toISOString() : null })
+    .eq("user_id", user.id)
+    .eq("grade", "IVa")
+    .select("user_id");
+
+  if (error) {
+    console.error("Kontraktur-Meldung konnte nicht gespeichert werden:", error.message);
     return "error";
   }
   return data.length > 0 ? "updated" : "notFound";
