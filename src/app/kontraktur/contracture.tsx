@@ -4,9 +4,9 @@ import { useTranslations } from "next-intl";
 import { useActionState } from "react";
 import type { IsoDate } from "@/lib/treatment-plan/treatment-plan";
 import { useToday } from "@/lib/use-today";
-import { useFormatDate } from "./format-date";
-import { report, switchToGradeFourB, withdraw } from "./kontraktur/actions";
-import type { SurgeryFormState } from "./kontraktur/validate-surgery-form";
+import { useFormatDate } from "../format-date";
+import { report, switchToGradeFourB, withdraw } from "./actions";
+import type { SurgeryFormState } from "./validate-surgery-form";
 
 const notFailed = { failed: false };
 const noSurgeryErrors: SurgeryFormState = { errors: [] };

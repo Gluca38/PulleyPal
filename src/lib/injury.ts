@@ -86,18 +86,25 @@ export type UpdateInjuryResult = "updated" | "notFound" | "error";
 
 // Überschreibt die Verletzung der eingeloggten Person (kein Verlauf). Die
 // Bestätigung vom Erfassen bleibt bestehen. Eine gemeldete Kontraktur gibt es
-// nur bei Grad IV a und entfällt bei einem anderen Grad.
-export async function updateInjury(injury: Injury): Promise<UpdateInjuryResult> {
+// nur bei Grad IV a und entfällt bei einem anderen Grad. Mit onlyIfGrade wird
+// nur überschrieben, wenn noch dieser Grad gespeichert ist (sonst notFound).
+export async function updateInjury(
+  injury: Injury,
+  { onlyIfGrade }: { onlyIfGrade?: Grade } = {},
+): Promise<UpdateInjuryResult> {
   const user = await getCurrentUser();
   const supabase = await createClient();
-  const { data, error } = await supabase
+  let query = supabase
     .from("injuries")
     .update({
       ...injuryToRow(injury),
       ...(injury.grade === "IVa" ? {} : { contracture_reported_at: null }),
     })
-    .eq("user_id", user.id)
-    .select("user_id");
+    .eq("user_id", user.id);
+  if (onlyIfGrade) {
+    query = query.eq("grade", onlyIfGrade);
+  }
+  const { data, error } = await query.select("user_id");
 
   if (error) {
     console.error("Verletzung konnte nicht geändert werden:", error.message);

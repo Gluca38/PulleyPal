@@ -5,7 +5,7 @@ import type { SavedInjury } from "@/lib/injury";
 import { calculateTreatmentPlan } from "@/lib/treatment-plan/treatment-plan";
 import { useToday } from "@/lib/use-today";
 import { ClarifyNotice } from "./clarify-notice";
-import { ContractureNotice, ReportContracture } from "./contracture";
+import { ContractureNotice, ReportContracture } from "./kontraktur/contracture";
 import { Timeline } from "./timeline";
 import { TodayCard } from "./today-card";
 

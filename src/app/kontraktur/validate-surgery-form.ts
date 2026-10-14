@@ -1,5 +1,5 @@
 import type { IsoDate } from "@/lib/treatment-plan/treatment-plan";
-import { isValidDate, latestStartDate } from "../verletzung/validate-injury-form";
+import { isValidDate, latestStartDate } from "@/lib/treatment-plan/dates";
 
 export type SurgeryFormError =
   | "surgeryDateMissing"

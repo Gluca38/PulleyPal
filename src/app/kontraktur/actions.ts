@@ -49,12 +49,12 @@ export async function switchToGradeFourB(
     return { errors, surgeryDate: String(formData.get("surgeryDate") ?? "") };
   }
 
-  const result = await updateInjury({
-    grade: "IVb",
-    startDate: surgeryDate,
-    prescribedDurationWeeks: null,
-    protectionType: null,
-  });
+  // Nur, solange noch Grad IV a gespeichert ist; sonst zeigt die Startseite
+  // den aktuellen Stand (notFound)
+  const result = await updateInjury(
+    { grade: "IVb", startDate: surgeryDate, prescribedDurationWeeks: null, protectionType: null },
+    { onlyIfGrade: "IVa" },
+  );
   if (result === "error") {
     return { errors: ["saveFailed"], surgeryDate };
   }
