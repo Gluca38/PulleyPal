@@ -1,6 +1,19 @@
 {
   "Startseite": {
     "titel": "PulleyPal",
-    "beschreibung": "Begleitet dich bei der Genesung nach einer Ringbandverletzung."
+    "beschreibung": "Begleitet dich bei der Genesung nach einer Ringbandverletzung.",
+    "angemeldetAls": "Angemeldet als {email}",
+    "abmelden": "Abmelden"
+  },
+  "Login": {
+    "titel": "Anmelden",
+    "anleitung": "Gib deine E-Mail-Adresse ein. Wir schicken dir einen Link, mit dem du dich ohne Passwort anmeldest.",
+    "emailLabel": "E-Mail-Adresse",
+    "linkAnfordern": "Login-Link senden",
+    "sendet": "Wird gesendet …",
+    "linkGesendet": "Link wurde gesendet. Schau in dein Postfach ({email}) und klicke auf den Link in der E-Mail.",
+    "emailUngueltig": "Bitte gib eine gültige E-Mail-Adresse ein.",
+    "fehlerBeimSenden": "Der Link konnte gerade nicht gesendet werden. Bitte versuche es in ein paar Minuten noch einmal.",
+    "linkUngueltig": "Dieser Login-Link ist abgelaufen oder wurde schon benutzt. Fordere unten einfach einen neuen an."
   }
 }
