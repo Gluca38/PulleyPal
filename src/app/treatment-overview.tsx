@@ -3,6 +3,7 @@
 import type { Injury } from "@/lib/injury";
 import { calculateTreatmentPlan } from "@/lib/treatment-plan/treatment-plan";
 import { useToday } from "@/lib/use-today";
+import { ClarifyNotice } from "./clarify-notice";
 import { Timeline } from "./timeline";
 import { TodayCard } from "./today-card";
 
@@ -18,6 +19,7 @@ export function TreatmentOverview({ injury }: { injury: Injury }) {
   return (
     <>
       <TodayCard status={plan.status} />
+      {plan.clarifyWithSurgeon && <ClarifyNotice />}
       <Timeline plan={plan} />
     </>
   );

@@ -4,8 +4,8 @@ import { redirect } from "next/navigation";
 import { createInjury } from "@/lib/injury";
 import { addDays, daysBetween } from "@/lib/treatment-plan/dates";
 import {
+  GRADES,
   PROTECTION_TYPES,
-  SUPPORTED_GRADES,
   prescribedDurationFor,
   type Grade,
   type ProtectionType,
@@ -13,7 +13,7 @@ import {
 
 export type InjuryFormError =
   | "gradeMissing"
-  | "gradeNotSupported"
+  | "gradeInvalid"
   | "startDateMissing"
   | "startDateInFuture"
   | "durationInvalid"
@@ -37,7 +37,7 @@ export type InjuryFormState = {
 const ISO_DATE = /^\d{4}-\d{2}-\d{2}$/;
 
 function isGrade(value: string): value is Grade {
-  return (SUPPORTED_GRADES as string[]).includes(value);
+  return (GRADES as readonly string[]).includes(value);
 }
 
 function isProtectionType(value: string): value is ProtectionType {
@@ -77,7 +77,7 @@ export async function saveInjury(
   if (!values.grade) {
     errors.push("gradeMissing");
   } else if (!isGrade(values.grade)) {
-    errors.push("gradeNotSupported");
+    errors.push("gradeInvalid");
   }
 
   if (!values.startDate || !isValidDate(values.startDate)) {
