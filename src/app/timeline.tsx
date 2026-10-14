@@ -80,7 +80,6 @@ export function Timeline({ plan }: { plan: TreatmentPlan }) {
         >
           <span className="timeline-title">{t("abgeschlossen")}</span>
           {completed && <span className="badge-current">{t("aktuell")}</span>}
-          <span className="hint">{t("ab", { datum: formatDate(plan.completedDate) })}</span>
         </li>
       </ol>
     </section>
