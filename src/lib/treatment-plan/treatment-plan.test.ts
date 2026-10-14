@@ -365,7 +365,7 @@ describe("Grad I", () => {
       expect(phaseOverview(plan)).toEqual([
         `${phase}: 2026-01-01 – 2026-01-14`,
         `${danach}: 2026-01-15 – 2026-01-28`,
-        "rebuild: 2026-01-29 – 2026-02-11",
+        "gradeOneRebuild: 2026-01-29 – 2026-02-11",
         "taping: 2026-02-12 – 2026-03-31",
       ]);
     },
@@ -382,7 +382,7 @@ describe("Grad I", () => {
       expect(phaseOverview(plan)).toEqual([
         `${phase}: 2026-01-01 – 2026-01-14`,
         "gradeOneWeek3to4HTapeForExercises: 2026-01-15 – 2026-01-28",
-        "rebuild: 2026-01-29 – 2026-02-11",
+        "gradeOneRebuild: 2026-01-29 – 2026-02-11",
         "taping: 2026-02-12 – 2026-03-31",
       ]);
     },
@@ -401,7 +401,7 @@ describe("Grad I", () => {
         `${phase}: 2026-01-01 – 2026-01-14`,
         `${woche3}: 2026-01-15 – 2026-01-21`,
         "gradeOneWeek4HTapeForExercises: 2026-01-22 – 2026-01-28",
-        "rebuild: 2026-01-29 – 2026-02-11",
+        "gradeOneRebuild: 2026-01-29 – 2026-02-11",
         "taping: 2026-02-12 – 2026-03-31",
       ]);
     },
@@ -499,7 +499,7 @@ describe("Grad I", () => {
     const { status } = gradeOne("2026-01-29");
 
     if (status.kind !== "active") throw new Error("Plan sollte laufen");
-    expect(status.phase.content).toBe("rebuild");
+    expect(status.phase.content).toBe("gradeOneRebuild");
     expect(status.rules).toContainEqual({ key: "carefulClimbingWithTape", type: "allowed" });
     expect(status.nextMilestone).toMatchObject({ kind: "fullClimbing", date: "2026-02-12" });
   });

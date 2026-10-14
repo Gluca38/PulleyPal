@@ -39,6 +39,8 @@ export type PhaseContent =
   // Aufbautraining vor der leichten sportartspezifischen Aktivität: noch kein Klettern
   | "rebuildBeforeClimbing"
   | "rebuild"
+  // Grad I: Aufbautraining nur zwei Wochen bis zur vollen Aktivität nach 6 Wochen
+  | "gradeOneRebuild"
   | "taping"
   // Schutzphase „Ab 4 Monaten“ (Grad IV a): Vollbelastung, Wettkampffähigkeit
   | "tapingFullLoad";
@@ -156,6 +158,8 @@ type GradeRules = {
     lightClimbing: After;
     fullClimbing: After;
     tapingEnd: After;
+    // ohne Angabe der allgemeine Inhalt „Aufbautraining“ aus Abschnitt 2
+    rebuildContent?: "gradeOneRebuild";
     tapingContent: "taping" | "tapingFullLoad";
     permanentTaping: boolean;
   };
@@ -172,6 +176,7 @@ const GRADE_RULES: Partial<Record<Grade, GradeRules>> = {
       // Abschnitt 3: „Ab 4 Monaten“ gilt nicht für Grad I
       fullClimbing: { weeks: 6 },
       tapingEnd: { months: 3 },
+      rebuildContent: "gradeOneRebuild",
       tapingContent: "taping",
       permanentTaping: false,
     }),
@@ -340,7 +345,7 @@ export function calculateTreatmentPlan(input: TreatmentPlanInput): TreatmentPlan
     ...rebuildBeforeClimbing,
     {
       kind: "rebuild",
-      content: "rebuild",
+      content: plan.rebuildContent ?? "rebuild",
       startDate: climbingStart,
       endDate: addDays(fullClimbing, -1),
     },

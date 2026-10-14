@@ -76,6 +76,7 @@ Vollbelastung, Wettkampffähigkeit. Weiterhin Taping für mindestens ein Jahr, b
 - Bei nur 2 Wochen Schutz läuft der Inhalt „Woche 5–6“ (in Woche 3–4) **mit H-Tape** statt unter Ringbandschutz.
 - Bei 3 Wochen Schutz endet der Schutz genau nach Woche 3: Woche 3 noch mit der verordneten Schutzart, Woche 4 mit H-Tape.
 - Nach Ende des verordneten Schutzes wird das H-Tape **nur bei den Übungen** getragen, nicht mehr tagsüber. Klettern bleibt bis Woche 5 verboten.
+- Das Aufbautraining dauert bei Grad I nur zwei Wochen (Woche 5–6). Statt „Belastungssteigerung … über 4–6 Wochen“ wird die Belastung in diesen zwei Wochen langsam gesteigert; volle sportartspezifische Aktivität ab Woche 7.
 
 ### Ablauf nach der Ringzeit (Grad I bis IV a)
 
