@@ -47,3 +47,184 @@ a {
     color-scheme: dark;
   }
 }
+
+/* Grundgestaltung, zuerst fürs Handy */
+:root {
+  --muted: #5f6368;
+  --border: #d0d4d9;
+  --card: #f6f7f9;
+  --accent: #1a5fb4;
+  --forbidden: #b3261e;
+  --allowed: #1e7a34;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --muted: #a8adb3;
+    --border: #3a3f45;
+    --card: #17191c;
+    --accent: #78aeed;
+    --forbidden: #f2867e;
+    --allowed: #7fd18f;
+  }
+}
+
+body {
+  line-height: 1.5;
+}
+
+.page {
+  width: 100%;
+  max-width: 40rem;
+  margin: 0 auto;
+  padding: 1.5rem 1rem 2rem;
+  display: flex;
+  flex-direction: column;
+  gap: 1.25rem;
+}
+
+h1 {
+  font-size: 1.75rem;
+}
+
+h2,
+h3 {
+  font-size: 1.1rem;
+}
+
+.stack {
+  display: flex;
+  flex-direction: column;
+  gap: 1.25rem;
+}
+
+.stack-small {
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+}
+
+.hint {
+  color: var(--muted);
+  font-size: 0.9rem;
+}
+
+fieldset {
+  border: none;
+}
+
+legend,
+label {
+  font-weight: 600;
+}
+
+.choice {
+  display: flex;
+  gap: 0.75rem;
+  align-items: flex-start;
+  padding: 0.75rem;
+  border: 1px solid var(--border);
+  border-radius: 0.5rem;
+  font-weight: normal;
+}
+
+.choice input {
+  margin-top: 0.3rem;
+  width: 1.1rem;
+  height: 1.1rem;
+  flex-shrink: 0;
+}
+
+.choice[aria-disabled="true"] {
+  opacity: 0.6;
+}
+
+.badge {
+  font-size: 0.8rem;
+  color: var(--muted);
+}
+
+input[type="date"],
+input[type="email"],
+select {
+  font: inherit;
+  padding: 0.6rem;
+  border: 1px solid var(--border);
+  border-radius: 0.5rem;
+  background: var(--background);
+  color: var(--foreground);
+  width: 100%;
+}
+
+button {
+  font: inherit;
+  font-weight: 600;
+  padding: 0.75rem 1rem;
+  border: none;
+  border-radius: 0.5rem;
+  background: var(--accent);
+  color: var(--background);
+  cursor: pointer;
+}
+
+button.secondary {
+  background: transparent;
+  color: var(--accent);
+  border: 1px solid var(--border);
+  padding: 0.5rem 0.75rem;
+}
+
+button:disabled {
+  opacity: 0.6;
+}
+
+.field-error {
+  color: var(--forbidden);
+  font-size: 0.9rem;
+}
+
+.card {
+  padding: 1.25rem 1rem;
+  border-radius: 0.75rem;
+  background: var(--card);
+  border: 1px solid var(--border);
+}
+
+.eyebrow {
+  font-size: 0.85rem;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--muted);
+}
+
+.week {
+  font-size: 1.6rem;
+  font-weight: 700;
+}
+
+.rules ul {
+  padding-left: 1.25rem;
+}
+
+.rules-forbidden h3 {
+  color: var(--forbidden);
+}
+
+.rules-allowed h3 {
+  color: var(--allowed);
+}
+
+.milestone {
+  padding-top: 1rem;
+  border-top: 1px solid var(--border);
+}
+
+.account-bar {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem 1rem;
+  align-items: center;
+  justify-content: space-between;
+  color: var(--muted);
+  font-size: 0.9rem;
+}

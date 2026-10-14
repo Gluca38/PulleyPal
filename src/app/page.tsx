@@ -1,34 +1,32 @@
 import { useTranslations } from "next-intl";
-import { getTranslations } from "next-intl/server";
+import { redirect } from "next/navigation";
 import { Suspense } from "react";
-import { logout } from "@/app/auth/actions";
-import { getCurrentUser } from "@/lib/auth";
+import { AccountBar } from "@/app/account-bar";
+import { getInjury } from "@/lib/injury";
+import { TodayCard } from "./today-card";
 
-// Geschützte Startseite: nur für eingeloggte Personen (vorerst einfach gehalten)
+// Geschützte Startseite: zeigt die Heute-Karte zur erfassten Verletzung
 export default function Home() {
   const t = useTranslations("Startseite");
 
   return (
-    <main>
+    <main className="page">
       <h1>{t("titel")}</h1>
-      <p>{t("beschreibung")}</p>
       <Suspense fallback={null}>
-        <Account />
+        <TodayCardForInjury />
+      </Suspense>
+      <Suspense fallback={null}>
+        <AccountBar />
       </Suspense>
     </main>
   );
 }
 
-async function Account() {
-  const user = await getCurrentUser();
-  const t = await getTranslations("Startseite");
-
-  return (
-    <>
-      <p>{t("angemeldetAls", { email: user.email })}</p>
-      <form action={logout}>
-        <button type="submit">{t("abmelden")}</button>
-      </form>
-    </>
-  );
+// Ohne erfasste Verletzung gibt es keinen Plan: dann zuerst erfassen
+async function TodayCardForInjury() {
+  const injury = await getInjury();
+  if (!injury) {
+    redirect("/verletzung");
+  }
+  return <TodayCard injury={injury} />;
 }

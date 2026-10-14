@@ -13,9 +13,9 @@ test("Login per Link und Logout", async ({ page }) => {
 
   await expect(page.getByText(`Angemeldet als ${email}`)).toBeVisible();
 
-  // Eingeloggte Personen brauchen die Login-Seite nicht
+  // Eingeloggte Personen brauchen die Login-Seite nicht (ohne Verletzung geht es weiter zum Erfassen)
   await page.goto("/login");
-  await expect(page).toHaveURL("/");
+  await expect(page).toHaveURL("/verletzung");
 
   await page.getByRole("button", { name: "Abmelden" }).click();
   await expect(page).toHaveURL("/login");
@@ -31,7 +31,7 @@ test("Schon benutzter Link zeigt Hinweis und erlaubt neuen Link", async ({ page,
 
   // Erster Klick meldet an, damit ist der Link verbraucht
   await page.goto(link);
-  await expect(page).toHaveURL("/");
+  await expect(page).toHaveURL("/verletzung");
 
   // Zweiter Klick in einem frischen Browser (nicht eingeloggt)
   const guest = await browser.newPage();

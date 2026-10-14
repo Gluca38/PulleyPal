@@ -1,7 +1,9 @@
 {
   "Startseite": {
     "titel": "PulleyPal",
-    "beschreibung": "Begleitet dich bei der Genesung nach einer Ringbandverletzung.",
+    "beschreibung": "Begleitet dich bei der Genesung nach einer Ringbandverletzung."
+  },
+  "Konto": {
     "angemeldetAls": "Angemeldet als {email}",
     "abmelden": "Abmelden"
   },
@@ -15,5 +17,101 @@
     "emailUngueltig": "Bitte gib eine gültige E-Mail-Adresse ein.",
     "fehlerBeimSenden": "Der Link konnte gerade nicht gesendet werden. Bitte versuche es in ein paar Minuten noch einmal.",
     "linkUngueltig": "Dieser Login-Link ist abgelaufen oder wurde schon benutzt. Fordere unten einfach einen neuen an."
+  },
+  "Verletzung": {
+    "titel": "Verletzung erfassen",
+    "einleitung": "Aus deinen Angaben berechnet PulleyPal deinen persönlichen Behandlungsplan.",
+    "gradLegende": "Grad deiner Verletzung",
+    "gradHinweis": "Wähle den Grad, den deine Ärztin oder dein Arzt festgestellt hat. PulleyPal stellt keine Diagnose.",
+    "grad": {
+      "I": {
+        "name": "Grad I",
+        "beschreibung": "Ringbandzerrung"
+      },
+      "II": {
+        "name": "Grad II",
+        "beschreibung": "Komplette Ruptur A3 oder A4, oder Teilruptur A2"
+      },
+      "III": {
+        "name": "Grad III",
+        "beschreibung": "Komplette Ruptur A2"
+      },
+      "IVa": {
+        "name": "Grad IV a",
+        "beschreibung": "Mehrere Rupturen (A2/A3 bzw. A3/A4), konservativ behandelt"
+      },
+      "IVb": {
+        "name": "Grad IV b",
+        "beschreibung": "Mehrere Rupturen oder Sonderfälle, operativ behandelt"
+      }
+    },
+    "folgtBald": "folgt bald",
+    "starttagLabel": "Tag der Verletzung",
+    "starttagHinweis": "Ab diesem Tag zählen die Wochen deines Behandlungsplans. Du kannst ihn auch nachträglich eingeben.",
+    "dauerLabel": "Verordnete Dauer bis zur vollen sportartspezifischen Aktivität (optional)",
+    "dauerHinweis": "Wenn deine Ärztin oder dein Arzt nichts dazu gesagt hat, lass „Keine Angabe“ stehen. Dann gilt der längere, vorsichtigere Wert.",
+    "dauerKeineAngabe": "Keine Angabe ({wochen} Wochen)",
+    "dauerWochen": "{wochen} Wochen",
+    "bestaetigung": "Ich habe verstanden, dass PulleyPal keine ärztliche Behandlung ersetzt.",
+    "speichern": "Behandlungsplan erstellen",
+    "speichert": "Wird gespeichert …",
+    "fehler": {
+      "gradeMissing": "Bitte wähle den Grad deiner Verletzung.",
+      "gradeNotSupported": "Für diesen Grad gibt es noch keinen Behandlungsplan.",
+      "startDateMissing": "Bitte gib den Tag der Verletzung ein.",
+      "startDateInFuture": "Der Tag der Verletzung darf nicht in der Zukunft liegen.",
+      "durationInvalid": "Bitte wähle eine der angebotenen Dauern.",
+      "confirmationMissing": "Bitte bestätige, dass PulleyPal keine ärztliche Behandlung ersetzt.",
+      "saveFailed": "Deine Angaben konnten gerade nicht gespeichert werden. Bitte versuche es noch einmal."
+    }
+  },
+  "Behandlungsplan": {
+    "heute": "Heute",
+    "woche": "Woche {woche} von {gesamt}",
+    "phase": {
+      "week1to2": {
+        "name": "Woche 1–2 mit Ringbandschutzring",
+        "inhalt": "Geführte Bewegungen, vorsichtiges aktives Bewegen, leichte Isometrie, ggf. Coban-Taping unter dem Ring bei Bewegungsübungen."
+      },
+      "week3to4": {
+        "name": "Woche 3–4 mit Ringbandschutzring",
+        "inhalt": "Isometrie, Krankengymnastik/Ergotherapie. Vorsichtige geführte exzentrische Übungen mit minimalem Widerstand. Freies Bewegen im Alltag."
+      },
+      "week5to6": {
+        "name": "Woche 5–6 mit Ringbandschutzring",
+        "inhalt": "Vorsichtige konzentrische Kräftigung der Finger unter Ringbandschutz, z. B. mit Gogor (Muskers Climbing), unter schrittweiser Steigerung des Widerstands: mit den schwächsten Federn beginnen, dann langsam steigern. Zusätzlich leichte statische Halteübungen an der Griffleiste, aber noch kein Hängen am Griffboard. Direkten Druck auf das verletzte Ringband vermeiden (Klimmzugstange!)."
+      },
+      "rebuild": {
+        "name": "Aufbautraining",
+        "inhalt": "Vorsichtige Hängeübungen am Griffboard mit Slopergriffen und Entlastung durch ein Elastikband, Klimmzüge an der Stange mit H-Tape. Beginn vorsichtiges Klettern, Belastungssteigerung bis zur absoluten Vollbelastung über 4–6 Wochen. Ringbandschutz: H-Tape."
+      },
+      "taping": {
+        "name": "Schutzphase mit H-Tape",
+        "inhalt": "Volle sportartspezifische Aktivität. Das verheilte Ringband beim Klettern weiterhin mit H-Tape schützen."
+      }
+    },
+    "regelArt": {
+      "forbidden": "Verboten",
+      "allowed": "Erlaubt",
+      "reminder": "Denk daran"
+    },
+    "regel": {
+      "noClimbingWithSplint": "Kein Klettern mit dem Ringbandschutzring (erhebliche Verletzungsgefahr!)",
+      "removeSplintDaily": "Ring pro Tag eine Stunde abnehmen und die Haut einfetten (Panthenolsalbe). Ring mit Tape anspannen.",
+      "unspecificTraining": "Unspezifisches Training und allgemeines Krafttraining unter Schonung des verletzten Fingers",
+      "noHangingWithSplint": "Keine Hängeübungen mit Ringbandschutzring!",
+      "noClimbingYet": "Noch kein Klettern: bis dahin nur Hängeübungen, Entlastung mit Elastikband und Klimmzüge mit H-Tape",
+      "carefulClimbingWithTape": "Vorsichtiges Klettern mit H-Tape, Belastung langsam steigern",
+      "fullClimbingWithTape": "Uneingeschränkt klettern, dabei H-Tape tragen, bis der Schutz am {datum} endet"
+    },
+    "naechsterMeilenstein": "Nächster Meilenstein",
+    "meilenstein": {
+      "lightClimbing": "Leichte sportartspezifische Aktivität: vorsichtiges Klettern mit H-Tape",
+      "fullClimbing": "Volle sportartspezifische Aktivität: uneingeschränkt klettern (weiter mit H-Tape)",
+      "tapingEnd": "Ende des H-Tape-Schutzes"
+    },
+    "meilensteinAm": "am {datum}, {tage, plural, one {noch # Tag} other {noch # Tage}}",
+    "abgeschlossen": "Abgeschlossen",
+    "abgeschlossenText": "Dein Behandlungsplan ist abgeschlossen."
   }
 }
