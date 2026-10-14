@@ -158,7 +158,7 @@
       },
       "gradeFourBSplint": {
         "name": "Thermoplastischer Ring (bis ca. Woche 6)",
-        "inhalt": "Nach der Ruhigstellung trägst du 4 Wochen einen thermoplastischen Ring als Ringbandschutz. Was du in dieser Zeit üben darfst, legen Operateur oder Handtherapeut fest."
+        "inhalt": "Nach der Ruhigstellung trägst du 4 Wochen einen thermoplastischen Ring als Ringbandschutz. Halte dich an die Vorgaben deines Operateurs bzw. deiner Operateurin."
       },
       "gradeFourBRebuild": {
         "name": "Aufbauphase – noch kein Klettern",
@@ -167,6 +167,10 @@
       "gradeFourBLightClimbing": {
         "name": "Leichte sportartspezifische Aktivität",
         "inhalt": "Nach 4 Monaten: vorsichtiges Klettern mit H-Tape. Volle sportartspezifische Aktivität nach 6 Monaten."
+      },
+      "gradeFourBTaping": {
+        "name": "Schutzphase mit H-Tape",
+        "inhalt": "Nach 6 Monaten: volle sportartspezifische Aktivität. Beim Klettern den operierten Finger weiterhin mit H-Tape schützen, mindestens bis 12 Monate nach der OP."
       }
     },
     "klaeren": {
@@ -193,6 +197,7 @@
       "noHangingWithSplint": "Keine Hängeübungen mit Ringbandschutzring!",
       "noClimbingYet": "Noch kein Klettern: bis dahin nur Hängeübungen, Entlastung mit Elastikband und Klimmzüge mit H-Tape",
       "carefulClimbingWithTape": "Vorsichtiges Klettern mit H-Tape, Belastung langsam steigern",
+      "lightClimbingWithTape": "Vorsichtiges Klettern mit H-Tape",
       "fullClimbingWithTape": "Uneingeschränkt klettern, dabei H-Tape tragen bis einschließlich {datum}"
     },
     "naechsterMeilenstein": "Nächster Meilenstein",

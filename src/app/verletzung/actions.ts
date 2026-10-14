@@ -4,10 +4,9 @@ import { redirect } from "next/navigation";
 import { createInjury } from "@/lib/injury";
 import { addDays, daysBetween } from "@/lib/treatment-plan/dates";
 import {
-  GRADES,
   PROTECTION_TYPES,
+  isGrade,
   prescribedDurationFor,
-  type Grade,
   type ProtectionType,
 } from "@/lib/treatment-plan/treatment-plan";
 
@@ -35,10 +34,6 @@ export type InjuryFormState = {
 };
 
 const ISO_DATE = /^\d{4}-\d{2}-\d{2}$/;
-
-function isGrade(value: string): value is Grade {
-  return (GRADES as readonly string[]).includes(value);
-}
 
 function isProtectionType(value: string): value is ProtectionType {
   return (PROTECTION_TYPES as readonly string[]).includes(value);

@@ -551,7 +551,7 @@ describe("Grad IV b", () => {
       "gradeFourBSplint: 2026-01-15 – 2026-02-11",
       "gradeFourBRebuild: 2026-02-12 – 2026-04-30",
       "gradeFourBLightClimbing: 2026-05-01 – 2026-06-30",
-      "taping: 2026-07-01 – 2026-12-31",
+      "gradeFourBTaping: 2026-07-01 – 2026-12-31",
     ]);
   });
 
@@ -572,8 +572,8 @@ describe("Grad IV b", () => {
     { today: "2026-04-30", week: 18, kind: "rebuild", content: "gradeFourBRebuild", grenze: "letzter Tag Aufbauphase" },
     { today: "2026-05-01", week: 18, kind: "rebuild", content: "gradeFourBLightClimbing", grenze: "leichte Aktivität nach 4 Monaten" },
     { today: "2026-06-30", week: 26, kind: "rebuild", content: "gradeFourBLightClimbing", grenze: "letzter Tag leichte Aktivität" },
-    { today: "2026-07-01", week: 26, kind: "taping", content: "taping", grenze: "volle Aktivität nach 6 Monaten" },
-    { today: "2026-12-31", week: 53, kind: "taping", content: "taping", grenze: "letzter Tag H-Tape-Schutz" },
+    { today: "2026-07-01", week: 26, kind: "taping", content: "gradeFourBTaping", grenze: "volle Aktivität nach 6 Monaten" },
+    { today: "2026-12-31", week: 53, kind: "taping", content: "gradeFourBTaping", grenze: "letzter Tag H-Tape-Schutz" },
   ])("Eckpunkte Grad IV b: $grenze", ({ today, week, kind, content }) => {
     const { status } = gradeFourB(today);
 
@@ -608,7 +608,7 @@ describe("Grad IV b", () => {
     const { status } = gradeFourB("2026-05-01");
 
     if (status.kind !== "active") throw new Error("Plan sollte laufen");
-    expect(status.rules).toEqual([{ key: "carefulClimbingWithTape", type: "allowed" }]);
+    expect(status.rules).toEqual([{ key: "lightClimbingWithTape", type: "allowed" }]);
     expect(status.nextMilestone).toMatchObject({ kind: "fullClimbing", date: "2026-07-01" });
   });
 

@@ -34,7 +34,21 @@ Ein Zeitabschnitt im Behandlungsplan mit eigenen Aufgaben und Regeln, z. B. „W
 _Avoid_: Periode, Stufe, Abschnitt
 
 **Ring-Phase** (`splintPhase`):
-Eine Phase, in der der Ringbandschutz (Ring oder bei Grad I ggf. H-Tape) getragen wird und der Wochenplan gilt. Klettern ist verboten. Bei Grad I zählen auch die Wochen nach Ende des verordneten Schutzes bis Woche 4 dazu (Übungen mit H-Tape).
+Eine Phase, in der der Ringbandschutz (Ring oder bei Grad I ggf. H-Tape) getragen wird; bei Grad I bis IV a gilt darin der Wochenplan. Klettern ist verboten. Bei Grad I zählen auch die Wochen nach Ende des verordneten Schutzes bis Woche 4 dazu (Übungen mit H-Tape).
+
+**Operativ** (`operative`):
+Behandlung nach einer OP, nur Grad IV b. Statt Wochenplan gibt es nur **Eckpunkte**; die Nachbehandlung aus Abschnitt 2 des Behandlungsschemas gilt nicht.
+_Avoid_: chirurgisch
+
+**Ruhigstellung** (`immobilization`):
+Bei Grad IV b die ersten 2 Wochen nach der OP, vor der Ring-Phase.
+_Avoid_: Immobilisierung
+
+**Aufbauphase** (`gradeFourBRebuild`):
+Bei Grad IV b das Aufbautraining zwischen Ringende und 4 Monaten, ohne Ring und noch ohne Klettern. Was darin trainiert wird, klärt die Person ärztlich.
+
+**Klärungs-Hinweis** (`clarifyWithSurgeon`):
+Bei Grad IV b dauerhaft sichtbarer Hinweis, mit Operateur oder Handtherapeut zu klären, was in der Aufbauphase trainiert werden darf, ob mit H-Tape belastet werden darf und ab wann Hängeübungen am Griffboard erlaubt sind.
 
 **Aufbautraining** (`rebuildPhase`):
 Die Phase vom Ende der Ringzeit bis zur vollen sportartspezifischen Aktivität. Klettern erst ab dem Meilenstein „leichte sportartspezifische Aktivität“. Liegt dieser nach dem Ende der Ringzeit (z. B. Grad IV a, Woche 9–10), ist das Aufbautraining in zwei Phasen geteilt: erst **noch kein Klettern** (`rebuildBeforeClimbing`), dann mit vorsichtigem Klettern.

@@ -5,6 +5,10 @@ export type { IsoDate } from "./dates";
 export const GRADES = ["I", "II", "III", "IVa", "IVb"] as const;
 export type Grade = (typeof GRADES)[number];
 
+export function isGrade(value: string): value is Grade {
+  return (GRADES as readonly string[]).includes(value);
+}
+
 // Schutzart bei Grad I: thermoplastischer Ring oder H-Tape
 export const PROTECTION_TYPES = ["ring", "hTape"] as const;
 export type ProtectionType = (typeof PROTECTION_TYPES)[number];
@@ -48,7 +52,8 @@ export type PhaseContent =
   | "gradeFourBImmobilization"
   | "gradeFourBSplint"
   | "gradeFourBRebuild"
-  | "gradeFourBLightClimbing";
+  | "gradeFourBLightClimbing"
+  | "gradeFourBTaping";
 
 // Ringbandschutz in einer Ring-Phase. hTapeForExercises: Grad I nach Ende des
 // verordneten Schutzes, H-Tape nur noch bei den Übungen
@@ -83,6 +88,8 @@ export type Rule = {
     | "noHangingWithSplint"
     | "noClimbingYet"
     | "carefulClimbingWithTape"
+    // Grad IV b: Abschnitt 2 („Belastung langsam steigern“) gilt nicht
+    | "lightClimbingWithTape"
     | "fullClimbingWithTape";
   type: "allowed" | "forbidden" | "reminder";
   // z. B. bis wann mit H-Tape geklettert wird
@@ -193,7 +200,7 @@ type GradeRules = {
     // ohne Angabe die allgemeinen Inhalte „Aufbautraining“ aus Abschnitt 2
     rebuildBeforeClimbingContent?: "gradeFourBRebuild";
     rebuildContent?: "gradeOneRebuild" | "gradeFourBLightClimbing";
-    tapingContent: "taping" | "tapingFullLoad";
+    tapingContent: "taping" | "tapingFullLoad" | "gradeFourBTaping";
     permanentTaping: boolean;
     // Grad IV b: Abschnitt 2 gilt nicht, die Aufbauphase klärt die Person ärztlich
     operative: boolean;
@@ -280,7 +287,7 @@ const GRADE_RULES: Record<Grade, GradeRules> = {
       tapingEnd: { months: 12 },
       rebuildBeforeClimbingContent: "gradeFourBRebuild",
       rebuildContent: "gradeFourBLightClimbing",
-      tapingContent: "taping",
+      tapingContent: "gradeFourBTaping",
       permanentTaping: true,
       operative: true,
     }),
@@ -304,7 +311,7 @@ function operativeRulesFor(phase: Phase, lightClimbing: IsoDate, tapingEnd: IsoD
     return [{ key: "fullClimbingWithTape", type: "allowed", date: addDays(tapingEnd, -1) }];
   }
   if (phase.startDate >= lightClimbing) {
-    return [{ key: "carefulClimbingWithTape", type: "allowed" }];
+    return [{ key: "lightClimbingWithTape", type: "allowed" }];
   }
   return [{ key: "noClimbingBeforeLightClimbing", type: "forbidden", date: lightClimbing }];
 }
@@ -377,30 +384,30 @@ export function calculateTreatmentPlan(input: TreatmentPlanInput): TreatmentPlan
 
   // Ruhigstellung und Ring-Phasen lückenlos hintereinander ab dem Starttag
   const earlyPhases: Phase[] = [];
-  let splintEnd = startDate;
+  let earlyEnd = startDate;
   for (const early of plan.earlyPhases) {
-    const nextStart = addDays(splintEnd, early.weeks * 7);
+    const nextStart = addDays(earlyEnd, early.weeks * 7);
     earlyPhases.push({
       kind: early.kind,
       content: early.content,
       ...(early.kind === "splint" && { protection: early.protection }),
-      startDate: splintEnd,
+      startDate: earlyEnd,
       endDate: addDays(nextStart, -1),
     });
-    splintEnd = nextStart;
+    earlyEnd = nextStart;
   }
 
   // Abschnitt 3: Liegt die leichte sportartspezifische Aktivität nach dem Ende
   // der Ringzeit, gibt es bis dahin Aufbautraining noch ohne Klettern
-  const hasGap = lightClimbing > splintEnd;
-  const climbingStart = hasGap ? lightClimbing : splintEnd;
+  const hasGap = lightClimbing > earlyEnd;
+  const climbingStart = hasGap ? lightClimbing : earlyEnd;
   const rebuildBeforeClimbing: Phase[] =
     hasGap
       ? [
           {
             kind: "rebuild",
             content: plan.rebuildBeforeClimbingContent ?? "rebuildBeforeClimbing",
-            startDate: splintEnd,
+            startDate: earlyEnd,
             endDate: addDays(climbingStart, -1),
           },
         ]

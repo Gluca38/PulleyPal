@@ -6,16 +6,13 @@ import { useToday } from "@/lib/use-today";
 import {
   GRADES,
   PROTECTION_TYPES,
+  isGrade,
   prescribedDurationFor,
   type Grade,
 } from "@/lib/treatment-plan/treatment-plan";
 import { saveInjury, type InjuryFormError, type InjuryFormState } from "./actions";
 
 const initialState: InjuryFormState = { errors: [] };
-
-function isGrade(value: string): value is Grade {
-  return (GRADES as readonly string[]).includes(value);
-}
 
 export function InjuryForm() {
   const t = useTranslations("Verletzung");
