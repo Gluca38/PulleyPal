@@ -66,6 +66,10 @@ jobs:
       - run: npm ci
       - name: Playwright-Browser installieren
         run: npx playwright install --with-deps chromium
+      # Lokale Supabase in Docker; Stage und Prod werden von Tests nie berührt.
+      # Nur Datenbank, Login, API und Mail-Postfach starten, der Rest wird nicht gebraucht.
+      - name: Lokale Supabase starten
+        run: npx supabase start -x realtime,storage-api,imgproxy,studio,edge-runtime,logflare,vector,supavisor,postgres-meta
       - run: npm run test:e2e
       - name: Testbericht hochladen (bei Fehlern)
         if: ${{ failure() }}
