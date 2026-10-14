@@ -45,8 +45,7 @@
         "beschreibung": "Mehrere Rupturen oder Sonderfälle, operativ behandelt"
       }
     },
-    "folgtBald": "folgt bald",
-    "starttagLabel": "Tag der Verletzung",
+    "starttagLabel": "{grad, select, IVb {Tag der OP} other {Tag der Verletzung}}",
     "starttagHinweis": "Ab diesem Tag zählen die Wochen deines Behandlungsplans. Du kannst ihn auch nachträglich eingeben.",
     "schutzartLegende": "Verordneter Ringbandschutz",
     "schutzartHinweis": "Wähle, was deine Ärztin oder dein Arzt verordnet hat. Ohne Angabe gilt der Ring.",
@@ -67,9 +66,9 @@
     "speichert": "Wird gespeichert …",
     "fehler": {
       "gradeMissing": "Bitte wähle den Grad deiner Verletzung.",
-      "gradeNotSupported": "Für diesen Grad gibt es noch keinen Behandlungsplan.",
-      "startDateMissing": "Bitte gib den Tag der Verletzung ein.",
-      "startDateInFuture": "Der Tag der Verletzung darf nicht in der Zukunft liegen.",
+      "gradeInvalid": "Bitte wähle einen der angebotenen Grade.",
+      "startDateMissing": "Bitte gib den {grad, select, IVb {Tag der OP} other {Tag der Verletzung}} ein.",
+      "startDateInFuture": "Der {grad, select, IVb {Tag der OP} other {Tag der Verletzung}} darf nicht in der Zukunft liegen.",
       "durationInvalid": "Bitte wähle eine der angebotenen Dauern.",
       "protectionTypeInvalid": "Bitte wähle Ring oder H-Tape.",
       "confirmationMissing": "Bitte bestätige, dass PulleyPal keine ärztliche Behandlung ersetzt.",
@@ -152,6 +151,35 @@
       "tapingFullLoad": {
         "name": "Ab 4 Monaten: Vollbelastung mit H-Tape",
         "inhalt": "Vollbelastung, Wettkampffähigkeit. Weiterhin Taping für mindestens ein Jahr, besser auf Dauer."
+      },
+      "gradeFourBImmobilization": {
+        "name": "Ruhigstellung nach der OP",
+        "inhalt": "Der operierte Finger wird in den ersten 14 Tagen nach der OP ruhiggestellt (Immobilisation). Halte dich an die Vorgaben deines Operateurs bzw. deiner Operateurin."
+      },
+      "gradeFourBSplint": {
+        "name": "Thermoplastischer Ring (bis ca. Woche 6)",
+        "inhalt": "Nach der Ruhigstellung trägst du 4 Wochen einen thermoplastischen Ring als Ringbandschutz. Halte dich an die Vorgaben deines Operateurs bzw. deiner Operateurin."
+      },
+      "gradeFourBRebuild": {
+        "name": "Aufbauphase – noch kein Klettern",
+        "inhalt": "Ohne Ring, noch ohne Klettern. Die operierte Sehnenrekonstruktion heilt weiter ein. Die Handtherapie (Krankengymnastik/Ergotherapie) läuft weiter, die Belastung wird schrittweise gesteigert. Wie das konkret aussieht, legen nur Operateur oder Handtherapeut fest. Der Ablauf nach einer OP ist vorsichtiger und länger als bei konservativer Behandlung."
+      },
+      "gradeFourBLightClimbing": {
+        "name": "Leichte sportartspezifische Aktivität",
+        "inhalt": "Nach 4 Monaten: vorsichtiges Klettern mit H-Tape. Volle sportartspezifische Aktivität nach 6 Monaten."
+      },
+      "gradeFourBTaping": {
+        "name": "Schutzphase mit H-Tape",
+        "inhalt": "Nach 6 Monaten: volle sportartspezifische Aktivität. Beim Klettern den operierten Finger weiterhin mit H-Tape schützen, mindestens bis 12 Monate nach der OP."
+      }
+    },
+    "klaeren": {
+      "titel": "Mit Operateur oder Handtherapeut klären",
+      "einleitung": "Nach einer OP gibt PulleyPal nur Eckpunkte vor, keinen Wochenplan. Kläre ärztlich:",
+      "frage": {
+        "training": "was du in der Aufbauphase konkret trainieren darfst,",
+        "hTape": "ob du schon mit H-Tape belasten darfst,",
+        "hanging": "ab wann Hängeübungen am Griffboard erlaubt sind."
       }
     },
     "regelArt": {
@@ -169,6 +197,7 @@
       "noHangingWithSplint": "Keine Hängeübungen mit Ringbandschutzring!",
       "noClimbingYet": "Noch kein Klettern: bis dahin nur Hängeübungen, Entlastung mit Elastikband und Klimmzüge mit H-Tape",
       "carefulClimbingWithTape": "Vorsichtiges Klettern mit H-Tape, Belastung langsam steigern",
+      "lightClimbingWithTape": "Vorsichtiges Klettern mit H-Tape",
       "fullClimbingWithTape": "Uneingeschränkt klettern, dabei H-Tape tragen bis einschließlich {datum}"
     },
     "naechsterMeilenstein": "Nächster Meilenstein",

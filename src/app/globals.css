@@ -135,15 +135,6 @@ label {
   flex-shrink: 0;
 }
 
-.choice[aria-disabled="true"] {
-  opacity: 0.6;
-}
-
-.badge {
-  font-size: 0.8rem;
-  color: var(--muted);
-}
-
 input[type="date"],
 input[type="email"],
 select {
@@ -212,6 +203,14 @@ button:disabled {
 
 .rules-allowed h3 {
   color: var(--allowed);
+}
+
+.notice {
+  border-left: 4px solid var(--accent);
+}
+
+.notice ul {
+  padding-left: 1.25rem;
 }
 
 .milestone {

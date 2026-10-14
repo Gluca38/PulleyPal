@@ -533,3 +533,124 @@ describe("Grad I", () => {
     expect(status.phase).toMatchObject({ kind: "splint", protection: "ring" });
   });
 });
+
+function gradeFourB(today: string, overrides: Partial<TreatmentPlanInput> = {}) {
+  return calculateTreatmentPlan({ grade: "IVb", startDate: "2026-01-01", today, ...overrides });
+}
+
+describe("Grad IV b", () => {
+  it("Abschnitt 3, Grad IV b: keine verordnete Dauer abzufragen", () => {
+    expect(prescribedDurationFor("IVb")).toBeNull();
+  });
+
+  // Starttag = Tag der OP, 1. Januar: 2 Wochen = bis 14.1., 6 Wochen = bis 11.2.,
+  // 4 Monate = ab 1.5., 6 Monate = ab 1.7., 12 Monate = ab 1.1.2027
+  it("Abschnitt 3, Grad IV b: nur Eckpunkte, kein Wochenplan", () => {
+    expect(phaseOverview(gradeFourB("2026-01-01"))).toEqual([
+      "gradeFourBImmobilization: 2026-01-01 – 2026-01-14",
+      "gradeFourBSplint: 2026-01-15 – 2026-02-11",
+      "gradeFourBRebuild: 2026-02-12 – 2026-04-30",
+      "gradeFourBLightClimbing: 2026-05-01 – 2026-06-30",
+      "gradeFourBTaping: 2026-07-01 – 2026-12-31",
+    ]);
+  });
+
+  it("Abschnitt 1, Grad IV b: Meilensteine nach 4, 6 und 12 Monaten", () => {
+    expect(gradeFourB("2026-01-01").milestones).toEqual([
+      { kind: "lightClimbing", date: "2026-05-01" },
+      { kind: "fullClimbing", date: "2026-07-01" },
+      { kind: "tapingEnd", date: "2027-01-01" },
+    ]);
+  });
+
+  it.each([
+    { today: "2026-01-01", week: 1, kind: "immobilization", content: "gradeFourBImmobilization", grenze: "Tag der OP" },
+    { today: "2026-01-14", week: 2, kind: "immobilization", content: "gradeFourBImmobilization", grenze: "letzter Tag Ruhigstellung" },
+    { today: "2026-01-15", week: 3, kind: "splint", content: "gradeFourBSplint", grenze: "erster Tag mit Ring" },
+    { today: "2026-02-11", week: 6, kind: "splint", content: "gradeFourBSplint", grenze: "letzter Tag mit Ring" },
+    { today: "2026-02-12", week: 7, kind: "rebuild", content: "gradeFourBRebuild", grenze: "erster Tag Aufbauphase" },
+    { today: "2026-04-30", week: 18, kind: "rebuild", content: "gradeFourBRebuild", grenze: "letzter Tag Aufbauphase" },
+    { today: "2026-05-01", week: 18, kind: "rebuild", content: "gradeFourBLightClimbing", grenze: "leichte Aktivität nach 4 Monaten" },
+    { today: "2026-06-30", week: 26, kind: "rebuild", content: "gradeFourBLightClimbing", grenze: "letzter Tag leichte Aktivität" },
+    { today: "2026-07-01", week: 26, kind: "taping", content: "gradeFourBTaping", grenze: "volle Aktivität nach 6 Monaten" },
+    { today: "2026-12-31", week: 53, kind: "taping", content: "gradeFourBTaping", grenze: "letzter Tag H-Tape-Schutz" },
+  ])("Eckpunkte Grad IV b: $grenze", ({ today, week, kind, content }) => {
+    const { status } = gradeFourB(today);
+
+    if (status.kind !== "active") throw new Error("Plan sollte laufen");
+    expect(status.week).toBe(week);
+    expect(status.phase).toMatchObject({ kind, content });
+    expect(status.totalWeeks).toBe(53);
+  });
+
+  it("Abschnitt 3, Grad IV b: der Ring wird als Ringbandschutzring getragen", () => {
+    const { status } = gradeFourB("2026-01-15");
+
+    if (status.kind !== "active") throw new Error("Plan sollte laufen");
+    expect(status.phase.protection).toBe("ring");
+  });
+
+  // Abschnitt 2 gilt nur konservativ: keine Regeln daraus, Klettern erst nach 4 Monaten
+  it.each([
+    { today: "2026-01-01", grenze: "Ruhigstellung" },
+    { today: "2026-01-15", grenze: "Ring" },
+    { today: "2026-04-30", grenze: "Aufbauphase" },
+  ])("Abschnitt 3, Grad IV b ($grenze): noch kein Klettern bis 4 Monate", ({ today }) => {
+    const { status } = gradeFourB(today);
+
+    if (status.kind !== "active") throw new Error("Plan sollte laufen");
+    expect(status.rules).toEqual([
+      { key: "noClimbingBeforeLightClimbing", type: "forbidden", date: "2026-05-01" },
+    ]);
+  });
+
+  it("Abschnitt 3, Grad IV b: nach 4 Monaten vorsichtiges Klettern mit H-Tape", () => {
+    const { status } = gradeFourB("2026-05-01");
+
+    if (status.kind !== "active") throw new Error("Plan sollte laufen");
+    expect(status.rules).toEqual([{ key: "lightClimbingWithTape", type: "allowed" }]);
+    expect(status.nextMilestone).toMatchObject({ kind: "fullClimbing", date: "2026-07-01" });
+  });
+
+  it("Abschnitt 3, Grad IV b: nach 6 Monaten volles Klettern mit H-Tape bis zum Ende des 12. Monats", () => {
+    const { status } = gradeFourB("2026-07-01");
+
+    if (status.kind !== "active") throw new Error("Plan sollte laufen");
+    expect(status.rules).toEqual([
+      { key: "fullClimbingWithTape", type: "allowed", date: "2026-12-31" },
+    ]);
+  });
+
+  it("Abschnitt 3: ab 12 Monaten abgeschlossen mit Empfehlung, beim Klettern dauerhaft zu tapen", () => {
+    expect(gradeFourB("2026-12-31").status.kind).toBe("active");
+    expect(gradeFourB("2027-01-01").status).toEqual({ kind: "completed", permanentTaping: true });
+  });
+
+  it.each([
+    { today: "2026-01-01", grenze: "am Tag der OP" },
+    { today: "2027-06-01", grenze: "nach Abschluss" },
+  ])("Abschnitt 3, Grad IV b: Hinweis auf ärztliche Klärung immer sichtbar ($grenze)", ({ today }) => {
+    expect(gradeFourB(today).clarifyWithSurgeon).toBe(true);
+  });
+
+  it("Andere Grade: kein Hinweis auf ärztliche Klärung", () => {
+    expect(gradeTwo("2026-01-01").clarifyWithSurgeon).toBe(false);
+    expect(gradeFourA("2026-01-01").clarifyWithSurgeon).toBe(false);
+  });
+
+  // „Nach N Monaten“ = gleicher Kalendertag; fehlt der Tag, gilt der 1. des Folgemonats
+  it("Monatsrechnung: OP am 31. Oktober ergibt 1. März, 1. Mai und 31. Oktober", () => {
+    expect(gradeFourB("2026-10-31", { startDate: "2026-10-31" }).milestones).toEqual([
+      { kind: "lightClimbing", date: "2027-03-01" },
+      { kind: "fullClimbing", date: "2027-05-01" },
+      { kind: "tapingEnd", date: "2027-10-31" },
+    ]);
+  });
+
+  it("Monatsrechnung: OP am 29. Februar im Schaltjahr endet nach 12 Monaten am 1. März", () => {
+    const start = { startDate: "2028-02-29" };
+
+    expect(gradeFourB("2029-02-28", start).status.kind).toBe("active");
+    expect(gradeFourB("2029-03-01", start).status.kind).toBe("completed");
+  });
+});

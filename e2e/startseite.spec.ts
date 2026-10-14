@@ -29,12 +29,12 @@ test("Neue Person erfasst Grad II und sieht die Heute-Karte", async ({ page }) =
 
   await expect(page.getByRole("heading", { level: 1 })).toHaveText("Verletzung erfassen");
   await expect(page.getByText(/PulleyPal stellt keine Diagnose/)).toBeVisible();
-  // Grad I bis IV a sind schon auswählbar
-  await expect(page.getByRole("radio", { name: /Grad I\b/ })).toBeEnabled();
-  await expect(page.getByRole("radio", { name: /Grad III/ })).toBeEnabled();
-  await expect(page.getByRole("radio", { name: /Grad IV a/ })).toBeEnabled();
-  await expect(page.getByRole("radio", { name: /Grad IV b/ })).toBeDisabled();
-  await expect(page.getByText("folgt bald")).toHaveCount(1);
+  // Alle Grade sind auswählbar
+  const grades = page.getByRole("radio", { name: /^Grad / });
+  await expect(grades).toHaveCount(5);
+  for (const grade of await grades.all()) {
+    await expect(grade).toBeEnabled();
+  }
   // Die Schutzart gibt es nur bei Grad I
   await expect(page.getByRole("group", { name: "Verordneter Ringbandschutz" })).toHaveCount(0);
 
@@ -108,6 +108,48 @@ test("Grad IV a vor 9 Wochen: Aufbautraining, noch kein Klettern", async ({ page
     /^Aufbautraining(?! –)/,
     /Ab 4 Monaten: Vollbelastung/,
   ]);
+});
+
+test("Grad IV b: Tag der OP, nur Eckpunkte und Hinweis zur ärztlichen Klärung", async ({ page }) => {
+  await login(page);
+
+  await page.getByRole("radio", { name: /Grad IV b/ }).check();
+  // Bei Grad IV b zählt der Plan ab dem Tag der OP, ohne Dauer abzufragen
+  await expect(page.getByLabel("Tag der Verletzung")).toHaveCount(0);
+  await expect(page.getByLabel(/Verordnete Dauer/)).toHaveCount(0);
+
+  // OP vor 60 Tagen = Tag 61 = Woche 9: Ring vorbei, Aufbauphase ohne Klettern
+  await page.getByLabel("Tag der OP").fill(daysAgo(60));
+  await page.getByLabel(/keine ärztliche Behandlung ersetzt/).check();
+  await page.getByRole("button", { name: "Behandlungsplan erstellen" }).click();
+  await expect(page).toHaveURL("/");
+
+  const todayCard = page.getByRole("region", { name: "Heute" });
+  await expect(todayCard.getByText(/^Woche 9 von 53$/)).toBeVisible();
+  await expect(
+    todayCard.getByRole("heading", { name: "Aufbauphase – noch kein Klettern" }),
+  ).toBeVisible();
+  await expect(todayCard.getByText(/^Noch kein Klettern, auch nicht mit H-Tape/)).toBeVisible();
+  // Keine Regeln aus der konservativen Nachbehandlung (Abschnitt 2)
+  await expect(todayCard.getByText(/Hängeübungen|Unspezifisches Training/)).toHaveCount(0);
+
+  const notice = page.getByRole("region", { name: "Mit Operateur oder Handtherapeut klären" });
+  await expect(notice.getByRole("listitem")).toHaveText([
+    /in der Aufbauphase konkret trainieren/,
+    /mit H-Tape belasten/,
+    /Hängeübungen am Griffboard/,
+  ]);
+
+  // Nur Eckpunkte, kein Wochenplan
+  const timeline = page.getByRole("region", { name: "Zeitleiste" });
+  await expect(timeline.locator("summary")).toHaveText([
+    /Ruhigstellung nach der OP/,
+    /Thermoplastischer Ring/,
+    /Aufbauphase – noch kein Klettern/,
+    /Leichte sportartspezifische Aktivität/,
+    /Schutzphase mit H-Tape/,
+  ]);
+  await expect(timeline.getByText(/Woche \d+–\d+ mit Ringbandschutzring/)).toHaveCount(0);
 });
 
 test("Grad I mit H-Tape: Heute-Karte zeigt die H-Tape-Texte", async ({ page }) => {
