@@ -44,9 +44,10 @@ export async function fetchLoginLink(email: string): Promise<string> {
   return link!;
 }
 
+// Meldet eine neue Person an. Ohne erfasste Verletzung landet sie beim Erfassen.
 export async function login(page: Page, email = uniqueEmail()) {
   await requestLoginLink(page, email);
   await page.goto(await fetchLoginLink(email));
-  await expect(page).toHaveURL("/");
+  await expect(page).toHaveURL("/verletzung");
   return email;
 }
