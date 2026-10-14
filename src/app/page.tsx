@@ -1,8 +1,12 @@
+import { useTranslations } from "next-intl";
+
 export default function Home() {
+  const t = useTranslations("Startseite");
+
   return (
     <main>
-      <h1>PulleyPal</h1>
-      <p>Begleitet dich bei der Genesung nach einer Ringbandverletzung.</p>
+      <h1>{t("titel")}</h1>
+      <p>{t("beschreibung")}</p>
     </main>
   );
 }
